@@ -1,0 +1,130 @@
+{
+  "metadata": {
+    "title": "US ISO/RTO Electricity Supply Response Data",
+    "author": "Bottlenecks Lab",
+    "compiled": "2026-02-24",
+    "primary_year": 2024,
+    "notes": "Prices are 2024 day-ahead or real-time load-weighted averages from ISO market monitor reports. Capacity additions are calendar year 2024 commercial operations from EIA-860M and ISO reports. Queue completion rates span 2000–2020 entry cohorts from LBNL Queued Up and Brattle/AEU Scorecard."
+  },
+  "isos": [
+    {
+      "id": "ERCOT",
+      "name": "Electric Reliability Council of Texas",
+      "region": "Texas",
+      "wholesale_price_mwh": 27.33,
+      "capacity_additions_mw": 20000,
+      "peak_demand_gw": 85.6,
+      "queue_completion_pct": 42.6,
+      "color_group": "functional",
+      "qualitative_note": "Energy-only market with streamlined interconnection. Added ~20 GW in 2024 — more than any other ISO — driven by solar, battery, and gas. Queue completion rate 3–5× higher than peers.",
+      "sources": {
+        "price": "E3 2024 ERCOT Market Update (ERCOT North Hub DA avg)",
+        "capacity": "E3; IEEFA; Dallas Fed; Amperon (9.7 GW solar, 5 GW battery, 3.4 GW gas, 1.2 GW wind)",
+        "peak": "ERCOT (all-time record, Aug 20 2024)",
+        "queue": "Brattle/AEU Generator Interconnection Scorecard (2018–2020 cohort)"
+      }
+    },
+    {
+      "id": "SPP",
+      "name": "Southwest Power Pool",
+      "region": "Central US",
+      "wholesale_price_mwh": 27.56,
+      "capacity_additions_mw": 2500,
+      "peak_demand_gw": 54.0,
+      "queue_completion_pct": 15,
+      "color_group": "functional",
+      "qualitative_note": "Wind-dominated resource mix with lowest wholesale prices. Modest new additions in 2024 but historically strong wind buildout. Queue reforms underway.",
+      "sources": {
+        "price": "SPP 2024 Annual State of the Market Report (DA system avg)",
+        "capacity": "SPP ELCC Report; Amperon (1.2 GW wind, 0.5 GW solar, 0.8 GW battery)",
+        "peak": "SPP 2024 State of the Market (est. ~3% below 2023)",
+        "queue": "LBNL Queued Up; Brattle Scorecard"
+      }
+    },
+    {
+      "id": "MISO",
+      "name": "Midcontinent ISO",
+      "region": "Central US (15 states)",
+      "wholesale_price_mwh": 31.0,
+      "capacity_additions_mw": 8000,
+      "peak_demand_gw": 121.6,
+      "queue_completion_pct": 30,
+      "color_group": "functional",
+      "qualitative_note": "Largest US ISO by geographic footprint. Solar installations doubled in 2024. Queue reforms (MTEP cycles) improving throughput, but ~70% of projects still never reach fruition.",
+      "sources": {
+        "price": "Potomac Economics 2024 MISO State of the Market (RT avg LMP)",
+        "capacity": "MISO Wind/Solar Capacity Credit Report; Amperon (6.7 GW solar, 1.2 GW wind)",
+        "peak": "Amperon (Aug 26 2024)",
+        "queue": "Concentric Energy Advisors; LBNL Queued Up"
+      }
+    },
+    {
+      "id": "CAISO",
+      "name": "California ISO",
+      "region": "California",
+      "wholesale_price_mwh": 38.0,
+      "capacity_additions_mw": 7500,
+      "peak_demand_gw": 48.3,
+      "queue_completion_pct": 10,
+      "color_group": "intermediate",
+      "qualitative_note": "Battery storage leader — added 4.2 GW of batteries in 2024. High additions driven by state mandates, but only ~10% of queue projects reach operation. Duck curve dynamics suppress midday prices.",
+      "sources": {
+        "price": "CAISO DMM Q3/Q4 2024 Quarterly Reports (est. annual DA avg)",
+        "capacity": "CAISO 2024 Battery Storage Special Report; Amperon (4.2 GW battery, 3 GW solar)",
+        "peak": "Amperon (Sept 5 2024)",
+        "queue": "Concentric Energy Advisors; LBNL Queued Up"
+      }
+    },
+    {
+      "id": "PJM",
+      "name": "PJM Interconnection",
+      "region": "Mid-Atlantic & Midwest (13 states + DC)",
+      "wholesale_price_mwh": 33.74,
+      "capacity_additions_mw": 4800,
+      "peak_demand_gw": 152.6,
+      "queue_completion_pct": 12,
+      "color_group": "intermediate",
+      "qualitative_note": "Largest US ISO by peak demand. Data center load growth outpacing new supply. Queue backlog of 260+ GW with only 12% completion rate. 'Speed to power' crisis identified by RMI.",
+      "sources": {
+        "price": "Monitoring Analytics 2024 PJM State of the Market (RT LW avg LMP)",
+        "capacity": "PJM SOM; Amperon (4.5 GW solar, 0.29 GW wind, 43 MW storage)",
+        "peak": "Amperon; PJM (July 16 2024)",
+        "queue": "LBNL Queued Up; RMI; Brattle Scorecard"
+      }
+    },
+    {
+      "id": "NYISO",
+      "name": "New York ISO",
+      "region": "New York",
+      "wholesale_price_mwh": 38.0,
+      "capacity_additions_mw": 950,
+      "peak_demand_gw": 31.0,
+      "queue_completion_pct": 10,
+      "color_group": "broken",
+      "qualitative_note": "Extreme zonal price divergence — NYC (Zone J) averages ~$50+/MWh while upstate ~$25. Minimal new supply despite CLCPA mandates. Offshore wind procurement delays and Article 10 siting friction.",
+      "sources": {
+        "price": "Potomac Economics 2024 NYISO SOM (est. system-wide DA avg)",
+        "capacity": "NYISO Winter Assessment; ESAI Power (~452 MW pre-summer, ~935 MW total)",
+        "peak": "NYISO (2023 actual 30.2 GW; 2024 forecast 33.3 GW)",
+        "queue": "LBNL Queued Up; Brattle Scorecard"
+      }
+    },
+    {
+      "id": "ISO-NE",
+      "name": "ISO New England",
+      "region": "New England (6 states)",
+      "wholesale_price_mwh": 41.47,
+      "capacity_additions_mw": 400,
+      "peak_demand_gw": 24.4,
+      "queue_completion_pct": 8,
+      "color_group": "broken",
+      "qualitative_note": "Highest all-in wholesale cost ($87/MWh incl. capacity + ancillary). Vineyard Wind delivered only 136 MW before construction pause. Gas dependence + pipeline constraints drive winter price spikes. Worst queue completion rate nationally.",
+      "sources": {
+        "price": "ISO-NE Internal Market Monitor 2024 Annual Markets Report (DA avg)",
+        "capacity": "ISO Newswire; Vineyard Wind (136 MW offshore wind, ~200 MW solar, ~64 MW other)",
+        "peak": "FEL Power; ISO-NE (July 16 2024)",
+        "queue": "LBNL Queued Up; Brattle/AEU Scorecard"
+      }
+    }
+  ]
+}
