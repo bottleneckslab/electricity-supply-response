@@ -21,11 +21,12 @@ Day-ahead or real-time load-weighted average prices from each ISO's independent 
 | MISO | $31.00 | Potomac Economics 2024 MISO State of the Market (RT avg LMP) |
 | PJM | $33.74 | Monitoring Analytics 2024 PJM State of the Market (RT LW avg LMP) |
 | CAISO | $38.00 | CAISO DMM Q3/Q4 2024 Quarterly Reports (est. annual DA avg) |
-| NYISO | $38.00 | Potomac Economics 2024 NYISO SOM (est. system-wide DA avg) |
+| NYISO | $41.81 | NYISO "Impact of National & Global Conditions on Electricity Prices in New York" white paper |
 | ISO-NE | $41.47 | ISO-NE Internal Market Monitor 2024 Annual Markets Report (DA avg) |
 
 **Notes:**
 - ERCOT 2024 prices dropped ~50% from 2023 ($55.50) due to massive solar/battery additions suppressing peak prices.
+- **DA/RT mixing**: ERCOT, SPP, and ISO-NE use day-ahead averages; MISO and PJM use real-time averages. DA prices are typically $1–3/MWh higher than RT. CAISO and NYISO are estimates from available reports. This introduces ~$2–5/MWh noise but the relative ordering is robust.
 - NYISO has extreme zonal divergence: Zone J (NYC) averages ~$50+/MWh, upstate Zone A ~$25/MWh. The system-wide average obscures this.
 - ISO-NE's all-in cost (energy + capacity + ancillary) was $87/MWh — highest nationally.
 
@@ -35,8 +36,8 @@ Generators reaching commercial operation in 2024, from EIA-860M filings and ISO 
 
 | ISO | New MW | Primary sources | Key breakdown |
 |-----|--------|----------------|---------------|
-| ERCOT | 20,000 | E3; IEEFA; Dallas Fed; Amperon | 9.7 GW solar, 5 GW battery, 3.4 GW gas, 1.2 GW wind |
-| MISO | 8,000 | MISO Capacity Credit Report; Amperon | 6.7 GW solar, 1.2 GW wind |
+| ERCOT | 18,700 | E3; IEEFA; Dallas Fed; Amperon | 9.7 GW solar, 4.4 GW battery, 3.4 GW gas, ~1.2 GW wind |
+| MISO | 7,500 | Brattle; MISO Capacity Credit Report | ~6.7 GW solar, ~0.8 GW wind + other |
 | CAISO | 7,500 | CAISO Battery Storage Report; Amperon | 4.2 GW battery, 3 GW solar |
 | PJM | 4,800 | PJM SOM; Amperon | 4.5 GW solar, 0.29 GW wind |
 | SPP | 2,500 | SPP ELCC Report; Amperon | 1.2 GW wind, 0.5 GW solar, 0.8 GW battery |
@@ -54,7 +55,7 @@ System coincident peak from 2024, used to normalize capacity additions and size 
 | ERCOT | 85.6 | Aug 20, 2024 | ERCOT (all-time record) |
 | SPP | 54.0 | Summer 2024 | SPP State of the Market |
 | CAISO | 48.3 | Sept 5, 2024 | Amperon |
-| NYISO | 31.0 | Summer 2024 | NYISO |
+| NYISO | 29.0 | July 8, 2024 | NYISO |
 | ISO-NE | 24.4 | July 16, 2024 | FEL Power; ISO-NE |
 
 ### Interconnection Queue Completion Rates (%)
@@ -85,12 +86,12 @@ supply_response = capacity_additions_mw / peak_demand_gw
 
 | ISO | MW/GW |
 |-----|-------|
-| ERCOT | 233.6 |
+| ERCOT | 218.5 |
 | CAISO | 155.3 |
-| MISO | 65.8 |
+| MISO | 61.7 |
 | SPP | 46.3 |
+| NYISO | 32.8 |
 | PJM | 31.4 |
-| NYISO | 30.6 |
 | ISO-NE | 16.4 |
 
 ### Bubble Sizing
@@ -111,8 +112,10 @@ radius = sqrt_scale(peak_demand_gw, domain=[24, 153], range=[14px, 48px])
 
 ## Caveats
 
-1. **Price comparability**: Mixing DA and RT averages across ISOs introduces ~$2–5/MWh noise. The relative ordering is robust.
+1. **Price comparability**: The dataset mixes DA averages (ERCOT, SPP, ISO-NE) with RT averages (MISO, PJM) and estimates (CAISO, NYISO). DA prices are typically $1–3/MWh higher. ERCOT uses a single hub (North Hub) while others use system-wide or load-weighted averages. The relative ordering is robust despite this noise.
 2. **ERCOT outlier year**: 2024 prices were anomalously low due to the solar/battery buildout. 2023 ($55.50) was more typical — the supply response worked *so well* it crashed prices.
 3. **CAISO's position**: High capacity additions are driven by state mandates (SB 100) and battery storage policy, not purely market signals. The low queue completion rate reflects speculative queue entries.
-4. **Queue cohort timing**: ERCOT's rate uses 2018–2020 cohorts (Brattle); others use 2000–2019 (LBNL). Newer cohorts generally have lower completion rates industry-wide.
+4. **Queue cohort timing**: ERCOT's 42.6% uses 2018–2020 cohorts (Brattle/AEU Scorecard); others use 2000–2019 (LBNL). Newer cohorts inherently show lower completion rates because less time has elapsed. The Brattle scorecard reports SPP, PJM, NYISO, and ISO-NE all at "<10%" for the 2018–2020 cohort — the values shown here (8–15%) draw from LBNL's longer cohort and are therefore not strictly comparable to ERCOT's.
 5. **Peak demand normalization**: Using nameplate MW vs. peak GW overstates variable resources (solar, wind) relative to firm capacity. An alternative metric using ELCC-weighted additions would show even starker differences.
+6. **Gross vs. net capacity**: All capacity figures are gross nameplate additions, not net of retirements. Significant coal retirements occurred in MISO and PJM in 2024 that are not reflected.
+7. **ERCOT peak demand**: The 85.6 GW figure reflects ERCOT's preliminary real-time value (Aug 20, 2024). Settled data shows 85.2 GW, slightly below the 2023 record of 85.5 GW. Whether 2024 was an all-time record depends on data vintage.
