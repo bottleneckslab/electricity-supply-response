@@ -16,11 +16,19 @@ We filter for generators whose operating year matches the target year
 to get new capacity additions.
 """
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
 from .ba_to_iso_mapping import get_iso_for_ba, ISO_LIST
+
+
+@dataclass
+class GeneratorAdditions:
+    """MW totals and project (generator) counts by ISO."""
+    mw_by_iso: dict[str, float]
+    count_by_iso: dict[str, int]
 
 
 # Common column name variations across EIA-860M vintages.
@@ -46,7 +54,7 @@ _COL_ALIASES = {
 def parse_generator_additions(
     filepath: Path,
     year: int = 2024,
-) -> dict[str, float]:
+) -> GeneratorAdditions:
     """Parse EIA-860M and return new capacity additions by ISO for a given year.
 
     Args:
@@ -54,7 +62,7 @@ def parse_generator_additions(
         year: Target year to filter for new commercial operations.
 
     Returns:
-        Dictionary mapping ISO name to total new nameplate capacity in MW.
+        GeneratorAdditions with MW totals and generator counts by ISO.
         Only includes ISOs with nonzero additions.
 
     Raises:
@@ -94,15 +102,24 @@ def parse_generator_additions(
     new_gen["iso"] = new_gen["ba_code"].astype(str).apply(get_iso_for_ba)
     new_gen = new_gen.dropna(subset=["iso", "capacity_mw"])
 
-    # Aggregate by ISO.
-    result = (
+    # Aggregate MW by ISO.
+    mw_result = (
         new_gen.groupby("iso")["capacity_mw"]
         .sum()
         .to_dict()
     )
 
-    # Round to nearest MW.
-    return {iso: round(mw) for iso, mw in result.items() if mw > 0}
+    # Count distinct generators by ISO.
+    count_result = (
+        new_gen.groupby("iso")["capacity_mw"]
+        .count()
+        .to_dict()
+    )
+
+    return GeneratorAdditions(
+        mw_by_iso={iso: round(mw) for iso, mw in mw_result.items() if mw > 0},
+        count_by_iso={iso: int(n) for iso, n in count_result.items() if n > 0},
+    )
 
 
 def _read_generator_sheet(filepath: Path) -> pd.DataFrame:

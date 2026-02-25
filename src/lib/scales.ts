@@ -1,26 +1,41 @@
 import { scaleLinear, scaleSqrt } from "@visx/scale";
-import type { ISODataPoint, YAxisMetric } from "./types";
-import { capacityPerGwPeak } from "./types";
+import type { ISODataPoint, XAxisMetric, PriceMetric } from "./types";
+import { capacityPerGwPeak, projectsPerGwPeak } from "./types";
 
-export function getXValue(d: ISODataPoint, metric: YAxisMetric): number {
+export function getXValue(d: ISODataPoint, metric: XAxisMetric): number {
   if (metric === "queue") return d.queue_completion_pct;
+  if (metric === "projects") return projectsPerGwPeak(d);
   return capacityPerGwPeak(d);
 }
 
-export function getXLabel(metric: YAxisMetric): string {
+export function getXLabel(metric: XAxisMetric): string {
   if (metric === "queue") return "Queue Completion Rate (%)";
+  if (metric === "projects") return "Projects Reaching COD (per GW Peak)";
   return "New Capacity (MW per GW of System Peak)";
 }
 
-export function getXSubtitle(metric: YAxisMetric): string {
+export function getXSubtitle(metric: XAxisMetric): string {
   if (metric === "queue")
     return "Share of Interconnection Requests Reaching Commercial Operation";
+  if (metric === "projects")
+    return "Distinct Generators Reaching Commercial Operation per GW of System Peak";
   return "Annual New Generation Reaching Commercial Operation (MW per GW of System Peak)";
+}
+
+export function getYValue(d: ISODataPoint, priceMetric: PriceMetric): number {
+  return priceMetric === "all_in" ? d.all_in_price_mwh : d.wholesale_price_mwh;
+}
+
+export function getYLabel(priceMetric: PriceMetric): string {
+  return priceMetric === "all_in"
+    ? "All-In Price ($/MWh, Energy + Capacity)"
+    : "Average Wholesale Price ($/MWh)";
 }
 
 export function createScales(
   data: ISODataPoint[],
-  metric: YAxisMetric,
+  metric: XAxisMetric,
+  priceMetric: PriceMetric,
   width: number,
   height: number,
   margin: { top: number; right: number; bottom: number; left: number },
@@ -29,7 +44,7 @@ export function createScales(
   const yMax = height - margin.top - margin.bottom;
 
   const xValues = data.map((d) => getXValue(d, metric));
-  const priceValues = data.map((d) => d.wholesale_price_mwh);
+  const priceValues = data.map((d) => getYValue(d, priceMetric));
   const peakValues = data.map((d) => d.peak_demand_gw);
 
   // X-axis: capacity metric (supply response)

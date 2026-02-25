@@ -45,12 +45,12 @@ def main() -> None:
 
     # Collect data from each source.
     prices = _collect_wholesale_prices()
-    additions = _collect_generator_additions()
+    additions_mw, additions_count = _collect_generator_additions()
     peaks = _collect_peak_demand()
     queue_rates = _collect_queue_completion()
 
     # Merge into the output structure.
-    dataset = _build_output(prices, additions, peaks, queue_rates)
+    dataset = _build_output(prices, additions_mw, additions_count, peaks, queue_rates)
 
     # Write output.
     _OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -80,23 +80,23 @@ def _collect_wholesale_prices() -> dict[str, float]:
         return {}
 
 
-def _collect_generator_additions() -> dict[str, float]:
-    """Run the generator additions parser."""
+def _collect_generator_additions() -> tuple[dict[str, float], dict[str, int]]:
+    """Run the generator additions parser. Returns (mw_dict, count_dict)."""
     print("[2/4] Generator additions (EIA-860M)...")
 
     filepath = _RAW_DIR / "eia860m.xlsx"
     if not filepath.exists():
         print(f"  SKIP: {filepath.name} not found in data/raw/")
-        return {}
+        return {}, {}
 
     try:
         from .sources.generator_additions import parse_generator_additions
         result = parse_generator_additions(filepath, year=2024)
-        print(f"  OK: got additions for {len(result)} ISOs — {list(result.keys())}")
-        return result
+        print(f"  OK: got additions for {len(result.mw_by_iso)} ISOs — {list(result.mw_by_iso.keys())}")
+        return result.mw_by_iso, result.count_by_iso
     except Exception as exc:
         print(f"  ERROR: {exc}")
-        return {}
+        return {}, {}
 
 
 def _collect_peak_demand() -> dict[str, float]:
@@ -140,7 +140,8 @@ def _collect_queue_completion() -> dict[str, float]:
 
 def _build_output(
     prices: dict[str, float],
-    additions: dict[str, float],
+    additions_mw: dict[str, float],
+    additions_count: dict[str, int],
     peaks: dict[str, float],
     queue_rates: dict[str, float],
 ) -> dict:
@@ -179,6 +180,18 @@ def _build_output(
         },
     }
 
+    # All-in prices: energy + capacity market payments ($/MWh equivalent).
+    # ERCOT has no capacity market; others add RPM/FCA/ICAP/RA/PRA.
+    _ALL_IN_PRICES: dict[str, float] = {
+        "ERCOT": 27.33,  # energy-only, no capacity market
+        "SPP": 29.00,    # minimal capacity payments
+        "MISO": 33.00,   # PRA ~$2/MWh equivalent
+        "CAISO": 43.00,  # RA ~$5/MWh equivalent
+        "PJM": 42.00,    # RPM BRA ~$8/MWh equivalent
+        "NYISO": 50.00,  # ICAP ~$8/MWh equivalent
+        "ISO-NE": 87.00, # FCA ~$45/MWh equivalent
+    }
+
     isos = []
     for iso_id in ISO_LIST:
         meta = _ISO_META.get(iso_id, {})
@@ -191,8 +204,12 @@ def _build_output(
         # Add each metric if available.
         if iso_id in prices:
             entry["wholesale_price_mwh"] = prices[iso_id]
-        if iso_id in additions:
-            entry["capacity_additions_mw"] = additions[iso_id]
+        if iso_id in _ALL_IN_PRICES:
+            entry["all_in_price_mwh"] = _ALL_IN_PRICES[iso_id]
+        if iso_id in additions_mw:
+            entry["capacity_additions_mw"] = additions_mw[iso_id]
+        if iso_id in additions_count:
+            entry["project_count"] = additions_count[iso_id]
         if iso_id in peaks:
             entry["peak_demand_gw"] = peaks[iso_id]
         if iso_id in queue_rates:

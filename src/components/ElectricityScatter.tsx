@@ -1,14 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Group } from "@visx/group";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { GridRows, GridColumns } from "@visx/grid";
 import { useTooltip } from "@visx/tooltip";
-import type { ISODataPoint, YAxisMetric } from "../lib/types";
-import { createScales, getXValue, getXLabel, getXSubtitle } from "../lib/scales";
+import type { ISODataPoint, XAxisMetric, PriceMetric } from "../lib/types";
+import { createScales, getXValue, getXLabel, getXSubtitle, getYValue, getYLabel } from "../lib/scales";
 import { GROUP_FILLS, GROUP_STROKES, SHADED_REGION } from "../lib/colors";
 import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
 import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
+import { ChartToolbar } from "./ChartToolbar";
+import { QueueCompletionBar } from "./QueueCompletionBar";
 
 const WIDTH = 820;
 const HEIGHT = 580;
@@ -17,16 +19,17 @@ const MARGIN = { top: 60, right: 50, bottom: 88, left: 82 };
 /**
  * Hand-tuned label offsets per ISO to avoid overlaps.
  * [dx, dy] relative to bubble center, in px.
- * Axes swapped: x = capacity/queue, y = price (Marshallian convention).
+ * Keyed by x-axis metric. Energy vs all-in price may shift y positions
+ * but the offsets are robust enough for both price modes.
  */
-const LABEL_OFFSETS: Record<string, Record<YAxisMetric, [number, number]>> = {
-  ERCOT:    { capacity: [15, -30],  queue: [15, -22] },
-  SPP:      { capacity: [15, -18],  queue: [15, -18] },
-  MISO:     { capacity: [15, -10],  queue: [15, 8] },
-  CAISO:    { capacity: [-55, -20], queue: [-55, -15] },
-  PJM:      { capacity: [58, -15],  queue: [30, -55] },
-  NYISO:    { capacity: [15, -22],  queue: [-52, -10] },
-  "ISO-NE": { capacity: [-15, -18], queue: [-52, 8] },
+const LABEL_OFFSETS: Record<string, Record<XAxisMetric, [number, number]>> = {
+  ERCOT:    { capacity: [15, -30],  queue: [15, -22],  projects: [15, -30] },
+  SPP:      { capacity: [15, -18],  queue: [15, -18],  projects: [15, -18] },
+  MISO:     { capacity: [15, -10],  queue: [15, 8],    projects: [15, 8] },
+  CAISO:    { capacity: [-55, -20], queue: [-55, -15], projects: [-55, -20] },
+  PJM:      { capacity: [58, -15],  queue: [30, -55],  projects: [55, -15] },
+  NYISO:    { capacity: [15, -22],  queue: [-52, -10], projects: [15, -22] },
+  "ISO-NE": { capacity: [-15, -18], queue: [-52, 8],   projects: [-15, -18] },
 };
 
 interface Props {
@@ -34,7 +37,9 @@ interface Props {
 }
 
 export function ElectricityScatter({ data }: Props) {
-  const [metric, setMetric] = useState<YAxisMetric>("capacity");
+  const [metric, setMetric] = useState<XAxisMetric>("capacity");
+  const [priceMetric, setPriceMetric] = useState<PriceMetric>("energy");
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const {
     showTooltip,
@@ -48,6 +53,7 @@ export function ElectricityScatter({ data }: Props) {
   const { xScale, yScale, rScale, xMax, yMax } = createScales(
     data,
     metric,
+    priceMetric,
     WIDTH,
     HEIGHT,
     MARGIN,
@@ -65,11 +71,13 @@ export function ElectricityScatter({ data }: Props) {
   );
 
   // Shaded "broken supply response" region — upper-left (high price, low building).
-  // Capacity view: PJM, NYISO, ISO-NE. Queue view: PJM, CAISO, NYISO, ISO-NE.
-  const shadedX1 = metric === "capacity"
-    ? xScale(50)
-    : xScale(16);
-  const shadedY1 = yScale(32);
+  const shadedXThreshold =
+    metric === "capacity" ? 50
+    : metric === "queue" ? 16
+    : 0.7; // projects per GW peak
+  const shadedYThreshold = priceMetric === "all_in" ? 40 : 32;
+  const shadedX1 = xScale(shadedXThreshold);
+  const shadedY1 = yScale(shadedYThreshold);
 
   return (
     <div style={{ position: "relative" }}>
@@ -101,11 +109,16 @@ export function ElectricityScatter({ data }: Props) {
 
       {/* Controls */}
       <div style={{ marginBottom: 4, paddingLeft: MARGIN.left }}>
-        <ChartControls metric={metric} onChange={setMetric} />
+        <ChartControls
+          xMetric={metric}
+          yMetric={priceMetric}
+          onXChange={setMetric}
+          onYChange={setPriceMetric}
+        />
       </div>
 
       {/* SVG chart */}
-      <svg width={WIDTH} height={HEIGHT} style={{ overflow: "visible" }}>
+      <svg ref={svgRef} width={WIDTH} height={HEIGHT} style={{ overflow: "visible" }}>
         <Group top={MARGIN.top} left={MARGIN.left}>
           {/* Grid */}
           <GridRows
@@ -149,7 +162,7 @@ export function ElectricityScatter({ data }: Props) {
           {/* Bubbles */}
           {data.map((d) => {
             const cx = xScale(getXValue(d, metric)) ?? 0;
-            const cy = yScale(d.wholesale_price_mwh) ?? 0;
+            const cy = yScale(getYValue(d, priceMetric)) ?? 0;
             const r = rScale(d.peak_demand_gw);
             return (
               <g key={d.id}>
@@ -172,7 +185,7 @@ export function ElectricityScatter({ data }: Props) {
           {/* Direct labels */}
           {data.map((d) => {
             const cx = xScale(getXValue(d, metric)) ?? 0;
-            const cy = yScale(d.wholesale_price_mwh) ?? 0;
+            const cy = yScale(getYValue(d, priceMetric)) ?? 0;
             const [dx, dy] = LABEL_OFFSETS[d.id]?.[metric] ?? [15, -15];
             return (
               <text
@@ -208,7 +221,7 @@ export function ElectricityScatter({ data }: Props) {
           />
           <AxisLeft
             scale={yScale}
-            label="Average Wholesale Price ($/MWh)"
+            label={getYLabel(priceMetric)}
             stroke={AXIS_STYLE.strokeColor}
             tickStroke={AXIS_STYLE.tickStroke}
             tickLabelProps={() => ({
@@ -223,18 +236,6 @@ export function ElectricityScatter({ data }: Props) {
             tickFormat={(v) => `$${v}`}
           />
         </Group>
-
-        {/* Footer */}
-        <text
-          x={WIDTH - MARGIN.right}
-          y={HEIGHT - 8}
-          textAnchor="end"
-          fontFamily={FONT.body}
-          fontSize={10}
-          fill="#aaa"
-        >
-          Bottlenecks Lab · Data: EIA, ISO Market Monitor Reports, LBNL Queued Up 2025
-        </text>
 
         {/* Bubble size legend — upper-right of chart area */}
         <Group top={MARGIN.top + 8} left={MARGIN.left + xMax - 230}>
@@ -275,14 +276,107 @@ export function ElectricityScatter({ data }: Props) {
         </Group>
       </svg>
 
+      {/* CAISO annotation — only on capacity view, only on hover */}
+      {tooltipOpen && tooltipData?.id === "CAISO" && metric === "capacity" && (
+        <div
+          style={{
+            position: "absolute",
+            left: MARGIN.left + (xScale(getXValue(tooltipData, metric)) ?? 0) - 100,
+            top: MARGIN.top + (yScale(getYValue(tooltipData, priceMetric)) ?? 0) + 30,
+            width: 150,
+            fontFamily: FONT.title,
+            fontSize: 9,
+            fontStyle: "italic",
+            color: "#8073ac",
+            opacity: 0.7,
+            lineHeight: 1.3,
+            pointerEvents: "none",
+            textAlign: "center",
+          }}
+        >
+          State mandates drive procurement despite queue friction
+        </div>
+      )}
+
       {/* Tooltip */}
       {tooltipOpen && tooltipData && (
         <ScatterTooltip
           data={tooltipData}
+          priceMetric={priceMetric}
           top={tooltipTop ?? 0}
           left={tooltipLeft ?? 0}
         />
       )}
+
+      {/* Footer — attribution + toolbar */}
+      <div
+        style={{
+          maxWidth: WIDTH,
+          paddingLeft: MARGIN.left,
+          paddingRight: MARGIN.right,
+          marginTop: -20,
+        }}
+      >
+        {/* Attribution row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginBottom: 6,
+          }}
+        >
+          {/* Logo mark */}
+          <svg width={14} height={14} viewBox="0 0 14 14">
+            <defs>
+              <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#2a9d8f" />
+                <stop offset="50%" stopColor="#e9c46a" />
+                <stop offset="100%" stopColor="#e76f51" />
+              </linearGradient>
+            </defs>
+            <rect width={14} height={14} fill="#1a1a2e" rx={1.5} />
+            <path
+              d="M 0,9.8 L 1.12,8.8 L 2.52,10.5 L 3.92,7 L 5.32,8.4 L 7,4.2 L 8.68,7.7 L 10.08,6.3 L 11.48,8.4 L 12.88,7.7 L 14,9.1"
+              stroke="url(#brandGrad)"
+              strokeWidth={0.9}
+              fill="none"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span
+            style={{
+              fontFamily: FONT.brand,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: "0.02em",
+              color: "#555",
+            }}
+          >
+            Bottlenecks Labs
+          </span>
+          <span
+            style={{
+              fontFamily: FONT.body,
+              fontSize: 9,
+              color: "#aaa",
+              marginLeft: "auto",
+            }}
+          >
+            Data: EIA, ISO Market Monitor Reports, LBNL Queued Up 2025
+          </span>
+        </div>
+
+        {/* Toolbar row */}
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <ChartToolbar svgRef={svgRef} width={WIDTH} height={HEIGHT} />
+        </div>
+      </div>
+
+      {/* Queue Completion Bar Chart (Panel B) */}
+      <div style={{ marginTop: 16, borderTop: "1px solid #e8e8e8", paddingTop: 16 }}>
+        <QueueCompletionBar data={data} marginLeft={MARGIN.left} width={WIDTH} />
+      </div>
     </div>
   );
 }

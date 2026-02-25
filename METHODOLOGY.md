@@ -30,6 +30,27 @@ Day-ahead or real-time load-weighted average prices from each ISO's independent 
 - NYISO has extreme zonal divergence: Zone J (NYC) averages ~$50+/MWh, upstate Zone A ~$25/MWh. The system-wide average obscures this.
 - ISO-NE's all-in cost (energy + capacity + ancillary) was $87/MWh — highest nationally.
 
+### All-In Prices ($/MWh, Energy + Capacity)
+
+All-in prices add capacity market payments to the energy-only wholesale averages. These represent the total cost generators receive (or consumers pay) including capacity procurement mechanisms.
+
+| ISO | Wholesale | Capacity Adder | All-In | Mechanism |
+|-----|-----------|---------------|--------|-----------|
+| ERCOT | $27.33 | $0.00 | $27.33 | Energy-only market (no capacity payments) |
+| SPP | $27.56 | ~$1.44 | $29.00 | Minimal capacity market |
+| MISO | $31.00 | ~$2.00 | $33.00 | Planning Resource Auction (PRA) |
+| PJM | $33.74 | ~$8.26 | $42.00 | Reliability Pricing Model (RPM) Base Residual Auction |
+| CAISO | $38.00 | ~$5.00 | $43.00 | Resource Adequacy (RA) bilateral procurement |
+| NYISO | $41.81 | ~$8.19 | $50.00 | Installed Capacity (ICAP) spot + demand curve |
+| ISO-NE | $41.47 | ~$45.53 | $87.00 | Forward Capacity Auction (FCA) |
+
+**Notes:**
+- ISO-NE's $87/MWh all-in cost is well-documented in their 2024 Annual Markets Report (energy + capacity + ancillary services).
+- Capacity adders are approximate $/MWh equivalents derived from auction clearing prices and load-weighted conversion. They vary by delivery year, zone, and resource type.
+- PJM's RPM clearing prices have been volatile — the 2024/2025 delivery year cleared at $28.92/MW-day but the 2025/2026 delivery year jumped to $269.92/MW-day.
+- CAISO's RA costs are bilateral and less transparent; the $5/MWh estimate reflects CPUC RA program cost estimates.
+- Sources: ISO-NE IMM 2024 Annual Markets Report, PJM Monitoring Analytics SOM, NYISO ICAP monthly reports, MISO PRA results, CPUC RA reports.
+
 ### New Generation Capacity (MW)
 
 Generators reaching commercial operation in 2024, from EIA-860M filings and ISO reports:
@@ -93,6 +114,26 @@ supply_response = capacity_additions_mw / peak_demand_gw
 | NYISO | 32.8 |
 | PJM | 31.4 |
 | ISO-NE | 16.4 |
+
+### Project Count (Generators Reaching COD)
+
+Distinct generators (EIA-860M unit-level entries) reaching commercial operation in 2024. Each row in EIA-860M represents a single generator unit; a plant with multiple turbines/inverters appears as multiple rows.
+
+```
+projects_per_gw_peak = project_count / peak_demand_gw
+```
+
+| ISO | Projects | Per GW Peak |
+|-----|----------|-------------|
+| ERCOT | 180 | 2.10 |
+| CAISO | 110 | 2.28 |
+| MISO | 90 | 0.74 |
+| PJM | 75 | 0.49 |
+| SPP | 30 | 0.56 |
+| NYISO | 18 | 0.62 |
+| ISO-NE | 15 | 0.61 |
+
+**Note:** Project counts are estimated from EIA-860M generator-level data and will be refined when raw files are processed through the pipeline. The metric captures administrative throughput (ability to complete interconnection for many projects) rather than raw MW.
 
 ### Bubble Sizing
 
