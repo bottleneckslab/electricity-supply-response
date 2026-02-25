@@ -4,7 +4,7 @@
     "author": "Bottlenecks Lab",
     "compiled": "2026-02-24",
     "primary_year": 2024,
-    "notes": "Prices are 2024 day-ahead or real-time load-weighted averages from ISO market monitor reports. Capacity additions are calendar year 2024 commercial operations from EIA-860M and ISO reports. Queue completion rates span 2000–2020 entry cohorts from LBNL Queued Up and Brattle/AEU Scorecard."
+    "notes": "Prices are 2024 annual averages from ISO market monitor reports. ERCOT, SPP, and ISO-NE are day-ahead averages; MISO and PJM are real-time load-weighted averages; CAISO and NYISO are estimated from available reports. DA prices are typically $1–3/MWh higher than RT. Capacity additions are gross nameplate MW reaching commercial operation in 2024 (not net of retirements). Queue completion rates span 2000–2020 entry cohorts from LBNL Queued Up and Brattle/AEU Scorecard; ERCOT uses a narrower 2018–2020 cohort."
   },
   "isos": [
     {
@@ -12,14 +12,14 @@
       "name": "Electric Reliability Council of Texas",
       "region": "Texas",
       "wholesale_price_mwh": 27.33,
-      "capacity_additions_mw": 20000,
+      "capacity_additions_mw": 18700,
       "peak_demand_gw": 85.6,
       "queue_completion_pct": 42.6,
       "color_group": "functional",
-      "qualitative_note": "Energy-only market with streamlined interconnection. Added ~20 GW in 2024 — more than any other ISO — driven by solar, battery, and gas. Queue completion rate 3–5× higher than peers.",
+      "qualitative_note": "Energy-only market with streamlined interconnection. Added ~18.7 GW in 2024 — more than any other ISO — driven by solar, battery, and gas. Queue completion rate 3–5× higher than peers.",
       "sources": {
         "price": "E3 2024 ERCOT Market Update (ERCOT North Hub DA avg)",
-        "capacity": "E3; IEEFA; Dallas Fed; Amperon (9.7 GW solar, 5 GW battery, 3.4 GW gas, 1.2 GW wind)",
+        "capacity": "E3; IEEFA; Dallas Fed; Amperon (9.7 GW solar, 4.4 GW battery, 3.4 GW gas, ~1.2 GW wind)",
         "peak": "ERCOT (all-time record, Aug 20 2024)",
         "queue": "Brattle/AEU Generator Interconnection Scorecard (2018–2020 cohort)"
       }
@@ -46,14 +46,14 @@
       "name": "Midcontinent ISO",
       "region": "Central US (15 states)",
       "wholesale_price_mwh": 31.0,
-      "capacity_additions_mw": 8000,
+      "capacity_additions_mw": 7500,
       "peak_demand_gw": 121.6,
       "queue_completion_pct": 30,
       "color_group": "functional",
       "qualitative_note": "Largest US ISO by geographic footprint. Solar installations doubled in 2024. Queue reforms (MTEP cycles) improving throughput, but ~70% of projects still never reach fruition.",
       "sources": {
         "price": "Potomac Economics 2024 MISO State of the Market (RT avg LMP)",
-        "capacity": "MISO Wind/Solar Capacity Credit Report; Amperon (6.7 GW solar, 1.2 GW wind)",
+        "capacity": "MISO confirmed 7.5 GW to COD in 2024 (Brattle); ~6.7 GW solar, ~0.8 GW wind+other",
         "peak": "Amperon (Aug 26 2024)",
         "queue": "Concentric Energy Advisors; LBNL Queued Up"
       }
@@ -96,16 +96,16 @@
       "id": "NYISO",
       "name": "New York ISO",
       "region": "New York",
-      "wholesale_price_mwh": 38.0,
+      "wholesale_price_mwh": 41.81,
       "capacity_additions_mw": 950,
-      "peak_demand_gw": 31.0,
+      "peak_demand_gw": 29.0,
       "queue_completion_pct": 10,
       "color_group": "broken",
       "qualitative_note": "Extreme zonal price divergence — NYC (Zone J) averages ~$50+/MWh while upstate ~$25. Minimal new supply despite CLCPA mandates. Offshore wind procurement delays and Article 10 siting friction.",
       "sources": {
-        "price": "Potomac Economics 2024 NYISO SOM (est. system-wide DA avg)",
+        "price": "NYISO 'Impact of National & Global Conditions on Electricity Prices in New York' white paper (2024 avg wholesale price)",
         "capacity": "NYISO Winter Assessment; ESAI Power (~452 MW pre-summer, ~935 MW total)",
-        "peak": "NYISO (2023 actual 30.2 GW; 2024 forecast 33.3 GW)",
+        "peak": "NYISO (actual 2024 peak ~29.0 GW, July 8 2024)",
         "queue": "LBNL Queued Up; Brattle Scorecard"
       }
     },
