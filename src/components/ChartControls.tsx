@@ -22,7 +22,7 @@ export function ChartControls({ metric, onChange }: Props) {
       }}
     >
       <span style={{ color: "#888", marginRight: 4, lineHeight: "30px" }}>
-        Y-axis:
+        X-axis:
       </span>
       {options.map((o) => (
         <button

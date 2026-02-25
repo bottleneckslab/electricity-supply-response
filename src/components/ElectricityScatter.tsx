@@ -4,28 +4,29 @@ import { AxisBottom, AxisLeft } from "@visx/axis";
 import { GridRows, GridColumns } from "@visx/grid";
 import { useTooltip } from "@visx/tooltip";
 import type { ISODataPoint, YAxisMetric } from "../lib/types";
-import { createScales, getYValue, getYLabel, getYSubtitle } from "../lib/scales";
+import { createScales, getXValue, getXLabel, getXSubtitle } from "../lib/scales";
 import { GROUP_FILLS, GROUP_STROKES, SHADED_REGION } from "../lib/colors";
 import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
 import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
 
 const WIDTH = 820;
-const HEIGHT = 560;
-const MARGIN = { top: 80, right: 50, bottom: 70, left: 72 };
+const HEIGHT = 580;
+const MARGIN = { top: 60, right: 50, bottom: 88, left: 82 };
 
 /**
  * Hand-tuned label offsets per ISO to avoid overlaps.
  * [dx, dy] relative to bubble center, in px.
+ * Axes swapped: x = capacity/queue, y = price (Marshallian convention).
  */
 const LABEL_OFFSETS: Record<string, Record<YAxisMetric, [number, number]>> = {
-  ERCOT:    { capacity: [-50, -30], queue: [15, -22] },
+  ERCOT:    { capacity: [15, -30],  queue: [15, -22] },
   SPP:      { capacity: [15, -18],  queue: [15, -18] },
   MISO:     { capacity: [15, -10],  queue: [15, 8] },
-  CAISO:    { capacity: [15, 6],    queue: [18, -26] },
-  PJM:      { capacity: [-52, -38], queue: [-52, -30] },
-  NYISO:    { capacity: [15, -26],  queue: [-50, 22] },
-  "ISO-NE": { capacity: [15, -16],  queue: [15, -16] },
+  CAISO:    { capacity: [-55, -20], queue: [-55, -15] },
+  PJM:      { capacity: [58, -15],  queue: [30, -55] },
+  NYISO:    { capacity: [15, -22],  queue: [-52, -10] },
+  "ISO-NE": { capacity: [-15, -18], queue: [-52, 8] },
 };
 
 interface Props {
@@ -63,20 +64,17 @@ export function ElectricityScatter({ data }: Props) {
     [showTooltip],
   );
 
-  // Shaded "broken supply response" region — bottom-right quadrant.
-  // Capacity view: PJM, NYISO, ISO-NE (CAISO excluded — high output from state mandates).
-  // Queue view: PJM, CAISO, NYISO, ISO-NE (all have ≤12% completion).
-  const shadedX0 = metric === "capacity"
-    ? xScale(32)
-    : xScale(32);
-  const shadedY0 = metric === "capacity"
-    ? yScale(50)
-    : yScale(16);
+  // Shaded "broken supply response" region — upper-left (high price, low building).
+  // Capacity view: PJM, NYISO, ISO-NE. Queue view: PJM, CAISO, NYISO, ISO-NE.
+  const shadedX1 = metric === "capacity"
+    ? xScale(50)
+    : xScale(16);
+  const shadedY1 = yScale(32);
 
   return (
     <div style={{ position: "relative" }}>
       {/* Title block */}
-      <div style={{ marginBottom: 8, paddingLeft: MARGIN.left }}>
+      <div style={{ marginBottom: 2, paddingLeft: MARGIN.left }}>
         <h2
           style={{
             fontFamily: FONT.title,
@@ -87,22 +85,22 @@ export function ElectricityScatter({ data }: Props) {
             lineHeight: 1.3,
           }}
         >
-          (a) Wholesale Price vs. New Capacity Across RTOs/ISOs
+          New Capacity vs. Wholesale Price Across RTOs/ISOs
         </h2>
         <p
           style={{
             fontFamily: FONT.body,
             fontSize: 13,
             color: "#666",
-            margin: "4px 0 0",
+            margin: "2px 0 0",
           }}
         >
-          {getYSubtitle(metric)}, 2024
+          {getXSubtitle(metric)}, 2024
         </p>
       </div>
 
       {/* Controls */}
-      <div style={{ marginBottom: 12, paddingLeft: MARGIN.left }}>
+      <div style={{ marginBottom: 4, paddingLeft: MARGIN.left }}>
         <ChartControls metric={metric} onChange={setMetric} />
       </div>
 
@@ -123,12 +121,12 @@ export function ElectricityScatter({ data }: Props) {
             strokeDasharray={GRID_STYLE.strokeDasharray}
           />
 
-          {/* Shaded "broken supply response" region */}
+          {/* Shaded "broken supply response" region — upper-left */}
           <rect
-            x={shadedX0}
-            y={shadedY0}
-            width={xMax - shadedX0}
-            height={yMax - shadedY0}
+            x={0}
+            y={0}
+            width={shadedX1}
+            height={shadedY1}
             fill={SHADED_REGION.fill}
             stroke={SHADED_REGION.stroke}
             strokeDasharray={SHADED_REGION.strokeDasharray}
@@ -136,9 +134,9 @@ export function ElectricityScatter({ data }: Props) {
             rx={4}
           />
           <text
-            x={xMax - 8}
-            y={yMax - 10}
-            textAnchor="end"
+            x={8}
+            y={18}
+            textAnchor="start"
             fontFamily={FONT.title}
             fontSize={12}
             fontStyle="italic"
@@ -150,8 +148,8 @@ export function ElectricityScatter({ data }: Props) {
 
           {/* Bubbles */}
           {data.map((d) => {
-            const cx = xScale(d.wholesale_price_mwh) ?? 0;
-            const cy = yScale(getYValue(d, metric)) ?? 0;
+            const cx = xScale(getXValue(d, metric)) ?? 0;
+            const cy = yScale(d.wholesale_price_mwh) ?? 0;
             const r = rScale(d.peak_demand_gw);
             return (
               <g key={d.id}>
@@ -173,8 +171,8 @@ export function ElectricityScatter({ data }: Props) {
 
           {/* Direct labels */}
           {data.map((d) => {
-            const cx = xScale(d.wholesale_price_mwh) ?? 0;
-            const cy = yScale(getYValue(d, metric)) ?? 0;
+            const cx = xScale(getXValue(d, metric)) ?? 0;
+            const cy = yScale(d.wholesale_price_mwh) ?? 0;
             const [dx, dy] = LABEL_OFFSETS[d.id]?.[metric] ?? [15, -15];
             return (
               <text
@@ -196,7 +194,7 @@ export function ElectricityScatter({ data }: Props) {
           <AxisBottom
             top={yMax}
             scale={xScale}
-            label="Average Wholesale Price ($/MWh)"
+            label={getXLabel(metric)}
             stroke={AXIS_STYLE.strokeColor}
             tickStroke={AXIS_STYLE.tickStroke}
             tickLabelProps={() => AXIS_STYLE.tickLabelProps}
@@ -204,21 +202,25 @@ export function ElectricityScatter({ data }: Props) {
               ...AXIS_STYLE.labelProps,
               dy: 12,
             }}
-            tickFormat={(v) => `$${v}`}
-          />
-          <AxisLeft
-            scale={yScale}
-            label={getYLabel(metric)}
-            stroke={AXIS_STYLE.strokeColor}
-            tickStroke={AXIS_STYLE.tickStroke}
-            tickLabelProps={() => AXIS_STYLE.tickLabelProps}
-            labelProps={{
-              ...AXIS_STYLE.labelProps,
-              dx: -10,
-            }}
             tickFormat={(v) =>
               metric === "queue" ? `${v}%` : String(v)
             }
+          />
+          <AxisLeft
+            scale={yScale}
+            label="Average Wholesale Price ($/MWh)"
+            stroke={AXIS_STYLE.strokeColor}
+            tickStroke={AXIS_STYLE.tickStroke}
+            tickLabelProps={() => ({
+              ...AXIS_STYLE.tickLabelProps,
+              dx: -6,
+              textAnchor: "end" as const,
+            })}
+            labelProps={{
+              ...AXIS_STYLE.labelProps,
+              dx: -28,
+            }}
+            tickFormat={(v) => `$${v}`}
           />
         </Group>
 
@@ -234,8 +236,8 @@ export function ElectricityScatter({ data }: Props) {
           Bottlenecks Lab · Data: EIA, ISO Market Monitor Reports, LBNL Queued Up 2025
         </text>
 
-        {/* Bubble size legend */}
-        <Group top={HEIGHT - 56} left={MARGIN.left + 4}>
+        {/* Bubble size legend — upper-right of chart area */}
+        <Group top={MARGIN.top + 8} left={MARGIN.left + xMax - 230}>
           <text
             fontFamily={FONT.body}
             fontSize={10}
