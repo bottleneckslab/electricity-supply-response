@@ -10,7 +10,6 @@ import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
 import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
 import { ChartToolbar } from "./ChartToolbar";
-import { QueueCompletionBar } from "./QueueCompletionBar";
 import { MethodologyNotes } from "./MethodologyNotes";
 import { useContainerWidth } from "../lib/useContainerWidth";
 
@@ -538,16 +537,6 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
             Bottlenecks Lab
           </span>
         </div>
-      </div>
-
-      {/* Queue Completion Bar Chart (Panel B) */}
-      <div style={{ marginTop: 16, borderTop: "1px solid #e8e8e8", paddingTop: 16 }}>
-        <QueueCompletionBar
-          data={data}
-          marginLeft={margin.left}
-          width={width}
-          granularity={granularity}
-        />
       </div>
 
       {/* Methodology & Data Notes (collapsible) */}
