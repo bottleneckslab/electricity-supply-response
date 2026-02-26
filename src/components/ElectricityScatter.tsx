@@ -56,7 +56,7 @@ interface Props {
 export function ElectricityScatter({ isoData, stateData }: Props) {
   const [containerRef, containerWidth] = useContainerWidth();
   const [granularity, setGranularity] = useState<GranularityLevel>("iso");
-  const [metric, setMetric] = useState<XAxisMetric>("queue");
+  const [metric, setMetric] = useState<XAxisMetric>("capacity");
   const [priceMetric, setPriceMetric] = useState<PriceMetric>("energy");
   const [weighting, setWeighting] = useState<CapacityWeighting>("nameplate");
   const [tappedId, setTappedId] = useState<string | null>(null);
