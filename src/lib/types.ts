@@ -22,6 +22,8 @@ export interface ISODataPoint {
   queue_cohort?: string;
   price_2023_mwh?: number;
   retail_price_cents_kwh?: number;
+  isEstimate?: boolean;
+  confidence?: string;
   color_group: ColorGroup;
   qualitative_note: string;
   sources: {

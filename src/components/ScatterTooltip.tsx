@@ -1,5 +1,6 @@
 import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
 import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel } from "../lib/types";
+import type { YearKey } from "../App";
 import { capacityPerGwPeak, capacityPerGwPeakElcc, projectsPerGwPeak } from "../lib/types";
 import { FONT } from "../lib/theme";
 import { GROUP_FILLS } from "../lib/colors";
@@ -10,6 +11,7 @@ interface Props {
   priceMetric: PriceMetric;
   weighting: CapacityWeighting;
   granularity: GranularityLevel;
+  year: YearKey;
   top: number;
   left: number;
 }
@@ -26,15 +28,17 @@ const tooltipStyles: React.CSSProperties = {
   borderRadius: 4,
 };
 
-export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granularity, top, left }: Props) {
+export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granularity, year, top, left }: Props) {
   const showElcc = weighting === "elcc" && data.capacity_additions_elcc_mw != null;
   const isStateView = granularity === "state";
+  const isEst = data.isEstimate === true;
 
   // In state view, show "TX (ERCOT)" format.
   const displayName = isStateView ? `${data.id} (${data.region})` : data.id;
   const subtitle = isStateView
     ? data.name
     : `${data.name} — ${data.region}`;
+  const yearLabel = year === "2025" ? "2025 (est.)" : year;
 
   // Check if queue rate is inherited from ISO.
   const queueInherited = data.queue_cohort?.startsWith("ISO-level");
@@ -45,12 +49,20 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
         style={{
           fontWeight: 700,
           fontSize: 14,
-          marginBottom: 6,
+          marginBottom: 2,
           color: GROUP_FILLS[data.color_group],
         }}
       >
         {displayName}
+        <span style={{ fontWeight: 400, fontSize: 11, color: "#999", marginLeft: 6 }}>
+          {yearLabel}
+        </span>
       </div>
+      {isEst && (
+        <div style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", marginBottom: 4 }}>
+          Estimated — {data.confidence ?? "projected values"}
+        </div>
+      )}
       <div style={{ color: "#666", fontSize: 12, marginBottom: 8 }}>
         {subtitle}
       </div>
@@ -68,7 +80,7 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
             value={`$${data.wholesale_price_mwh.toFixed(2)}/MWh`}
             highlight={!isStateView && priceMetric === "energy"}
           />
-          {data.price_2023_mwh != null && (
+          {year === "2024" && data.price_2023_mwh != null && (
             <Row
               label="2023 price"
               value={`$${data.price_2023_mwh.toFixed(2)}/MWh`}

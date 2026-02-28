@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "title": "US ISO/RTO Electricity Supply Response Data — 2025 Estimate",
+    "author": "Bottlenecks Lab",
+    "compiled": "2026-02-28",
+    "primary_year": 2025,
+    "notes": "PJM and MISO estimates. Both ISOs have locked-in capacity auction results for 2025/26 delivery year. PJM BRA at $269.92/MW-day (~$18/MWh adder, 9× increase). MISO PRA at $217/MW-day annualized (~$9/MWh adder, 10× increase; summer peak $666.50/MW-day, 22× increase). Wholesale prices and capacity additions estimated at levels similar to 2024."
+  },
+  "isos": [
+    {
+      "id": "MISO",
+      "name": "Midcontinent ISO",
+      "region": "Central US (15 states)",
+      "wholesale_price_mwh": 31.0,
+      "all_in_price_mwh": 40.0,
+      "capacity_additions_mw": 7000,
+      "capacity_additions_elcc_mw": 3430,
+      "project_count": 85,
+      "peak_demand_gw": 123.0,
+      "queue_completion_pct": 28,
+      "queue_cohort": "2018–2020",
+      "isEstimate": true,
+      "confidence": "PRA 2025/26 locked in. Summer $666.50/MW-day (22× increase). Annualized ~$217/MW-day (~$9/MWh capacity adder, 10× increase). Wholesale and capacity additions estimated.",
+      "color_group": "functional",
+      "qualitative_note": "MISO PRA 2025/26 prices exploded — summer capacity cost jumped 22× to $666.50/MW-day under the new Reliability-Based Demand Curve. Annualized average ~$217/MW-day (10× increase from $21/MW-day in 2024/25). Driven by tightening reserves, plant retirements, and the same structural underbuilding dynamics as PJM.",
+      "sources": {
+        "price": "Wholesale: estimated ~$31/MWh (similar to 2024). Capacity: PRA 2025/26 (Enel North America, Utility Dive, RTO Insider). Summer $666.50/MW-day, annualized ~$217/MW-day.",
+        "capacity": "Estimated ~7,000 MW (similar to 2024 EIA-860M)",
+        "peak": "Estimated ~123 GW (similar to 2024)",
+        "queue": "Brattle/Grid Strategies/AEU Scorecard (2018–2020 cohort)"
+      }
+    },
+    {
+      "id": "PJM",
+      "name": "PJM Interconnection",
+      "region": "Mid-Atlantic & Midwest (13 states + DC)",
+      "wholesale_price_mwh": 34.0,
+      "all_in_price_mwh": 52.0,
+      "capacity_additions_mw": 4000,
+      "capacity_additions_elcc_mw": 1400,
+      "project_count": 70,
+      "peak_demand_gw": 155.0,
+      "queue_completion_pct": 12,
+      "queue_cohort": "2000–2019",
+      "isEstimate": true,
+      "confidence": "BRA 2025/26 locked in at $269.92/MW-day (~$18/MWh capacity adder). Wholesale and capacity additions estimated.",
+      "color_group": "intermediate",
+      "qualitative_note": "BRA 2025/26 capacity price jumped 9× to $269.92/MW-day — the consequence of not building. All-in cost rises from ~$36 to ~$52/MWh. Queue backlog persists. Data center demand still growing.",
+      "sources": {
+        "price": "Wholesale: estimated ~$34/MWh (similar to 2024). Capacity: BRA 2025/26 at $269.92/MW-day (S&P Global, PJM official report)",
+        "capacity": "Estimated ~4,000 MW (similar to 2024 EIA-860M, queue still clogged)",
+        "peak": "Estimated ~155 GW (trending up from 152.6 GW in 2024 due to data center growth)",
+        "queue": "LBNL Queued Up (2000–2019 cohort); queue backlog persists"
+      }
+    }
+  ]
+}

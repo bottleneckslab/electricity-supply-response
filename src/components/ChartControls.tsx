@@ -1,4 +1,5 @@
 import type { XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel } from "../lib/types";
+import type { YearKey } from "../App";
 import { FONT } from "../lib/theme";
 
 interface Props {
@@ -7,10 +8,15 @@ interface Props {
   xMetric: XAxisMetric;
   yMetric: PriceMetric;
   weighting: CapacityWeighting;
+  year: YearKey;
+  availableYears: YearKey[];
+  playing: boolean;
   onGranularityChange: (g: GranularityLevel) => void;
   onXChange: (m: XAxisMetric) => void;
   onYChange: (m: PriceMetric) => void;
   onWeightingChange: (w: CapacityWeighting) => void;
+  onYearChange: (y: YearKey) => void;
+  onPlayToggle: () => void;
 }
 
 const granularityOptions: { value: GranularityLevel; label: string }[] = [
@@ -32,6 +38,12 @@ const weightingOptions: { value: CapacityWeighting; label: string }[] = [
   { value: "nameplate", label: "Nameplate MW" },
   { value: "elcc", label: "ELCC-Estimated" },
 ];
+
+const yearLabels: Record<YearKey, string> = {
+  "2023": "2023",
+  "2024": "2024",
+  "2025": "2025 (est.)",
+};
 
 function ToggleButton<T extends string>({
   value,
@@ -76,10 +88,15 @@ export function ChartControls({
   xMetric,
   yMetric,
   weighting,
+  year,
+  availableYears,
+  playing,
   onGranularityChange,
   onXChange,
   onYChange,
   onWeightingChange,
+  onYearChange,
+  onPlayToggle,
 }: Props) {
   const rowStyle: React.CSSProperties = {
     display: "flex",
@@ -121,6 +138,46 @@ export function ChartControls({
             fontSize={btnFontSize}
           />
         ))}
+      </div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>Year:</span>
+        {availableYears.map((y) => (
+          <ToggleButton
+            key={y}
+            value={y}
+            label={yearLabels[y]}
+            active={year === y}
+            onClick={onYearChange}
+            padding={btnPadding}
+            fontSize={btnFontSize}
+          />
+        ))}
+        <button
+          onClick={onPlayToggle}
+            title={playing ? "Pause" : "Play through years"}
+            style={{
+              marginLeft: 8,
+              padding: compact ? "3px 8px" : "4px 10px",
+              border: "1px solid",
+              borderColor: playing ? "#2a9d8f" : "#ccc",
+              borderRadius: 4,
+              background: playing ? "rgba(42, 157, 143, 0.08)" : "#fff",
+              color: playing ? "#2a9d8f" : "#888",
+              fontFamily: FONT.body,
+              fontSize: compact ? 13 : 14,
+              fontWeight: 400,
+              cursor: "pointer",
+              transition: "all 0.15s ease",
+              lineHeight: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: compact ? 28 : 32,
+              height: compact ? 24 : 28,
+            }}
+          >
+            {playing ? "⏸" : "▶"}
+          </button>
       </div>
       {granularity !== "state" && (
         <div style={rowStyle}>

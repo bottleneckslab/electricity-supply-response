@@ -8,7 +8,7 @@ This mirrors the Zidar housing economics framing: rents vs. building permits acr
 
 ## Data Sources
 
-All data is for calendar year **2024** unless otherwise noted.
+The chart supports **2023**, **2024**, and **2025 estimates** (PJM, MISO) via a year toggle. In ISO view, all three years are available; in state view, 2023 and 2024. All data is for calendar year **2024** by default unless otherwise noted.
 
 ### Wholesale Electricity Prices ($/MWh)
 
@@ -58,9 +58,9 @@ All-in prices add **only capacity auction payments** to the energy-only wholesal
 
 ### Retail Electricity Prices (cents/kWh) — State View
 
-The state view uses **EIA average retail electricity prices** (2024, all sectors) as the y-axis, giving each state an independent price value rather than inheriting the parent ISO's wholesale price.
+The state view uses **EIA average retail electricity prices** (selected year, all sectors) as the y-axis, giving each state an independent price value rather than inheriting the parent ISO's wholesale price. State data is available for 2023 and 2024.
 
-Source: [EIA State Electricity Profiles](https://www.eia.gov/electricity/state/) — Average Retail Price of Electricity (all sectors, 2024).
+Source: [EIA State Electricity Profiles](https://www.eia.gov/electricity/state/) — Average Retail Price of Electricity (all sectors, 2023 and 2024).
 
 **What retail prices include:** Generation, transmission, distribution, taxes, and regulatory charges. This means retail prices are substantially higher than wholesale prices and reflect end-consumer costs rather than generator revenue.
 
@@ -73,23 +73,37 @@ Source: [EIA State Electricity Profiles](https://www.eia.gov/electricity/state/)
 
 ### New Generation Capacity (MW)
 
-Generators reaching commercial operation in 2024, from EIA-860M filings and ISO reports:
+Generators reaching commercial operation, from EIA-860M January 2026 vintage:
 
-| ISO | Nameplate MW | ELCC MW | Primary sources | Key breakdown |
-|-----|-------------|---------|----------------|---------------|
-| ERCOT | 18,700 | ~9,800 | E3; IEEFA; Dallas Fed; Amperon | 9.7 GW solar, 4.4 GW battery, 3.4 GW gas, ~1.2 GW wind |
-| MISO | 7,500 | ~3,300 | Brattle; MISO Capacity Credit Report | ~6.7 GW solar, ~0.8 GW wind + other |
-| CAISO | 7,500 | ~4,640 | CAISO Battery Storage Report; Amperon | 4.2 GW battery, 3 GW solar** |
-| PJM | 4,800 | ~1,650 | PJM SOM; Amperon | 4.5 GW solar, 0.29 GW wind, 43 MW storage |
-| SPP | 2,500 | ~1,675 | SPP ELCC Report; Amperon | 1.2 GW wind, 0.5 GW solar, 0.8 GW battery |
-| NYISO | 950 | ~570 | NYISO Winter Assessment; ESAI Power | Mixed clean energy |
-| ISO-NE | 400 | ~200 | ISO Newswire; Vineyard Wind | 136 MW offshore wind*, ~200 MW solar |
+#### 2024 Capacity (EIA-860M)
 
-*Vineyard Wind blade failure (July 2024) shut down all 136 MW for ~6 months. Operational contribution in 2024 was severely limited despite reaching COD.
+| ISO | Nameplate MW | ELCC MW | Key breakdown |
+|-----|-------------|---------|---------------|
+| ERCOT | 13,973 | ~6,773 | solar 7,277 / battery 4,264 / wind 1,735 / gas 697 |
+| MISO | 7,156 | ~3,501 | solar 6,273 / wind 625 / gas 186 / battery 54 |
+| CAISO | 6,535 | ~4,064 | battery 3,638 / solar 2,688 / wind 143 / gas 48 |
+| PJM | 4,079 | ~1,420 | solar 3,817 / wind 189 / battery 54 |
+| SPP | 1,142 | ~271 | wind 902 / solar 225 |
+| NYISO | 1,069 | ~363 | solar 915 / wind 130 / battery 20 |
+| ISO-NE | 525 | ~230 | solar 421 / gas 65 / battery 25 |
 
-**CAISO solar may be understated: EIA projected ~4.8 GW solar for CAISO in 2024. The 3 GW used here is a conservative estimate pending final EIA-860M filing confirmation and may understate solar additions by 1–2 GW.
+**Filing-lag caveat:** EIA-860M January 2026 vintage may undercount recent additions due to filing lag. Industry sources report higher figures: ERCOT ~18.7 GW (E3, IEEFA, Dallas Fed, Amperon), SPP ~2.5 GW (SPP ELCC Report, Amperon). The EIA-860M figures are used for consistency across years.
 
-**Gross vs. net capacity:** All capacity figures are gross nameplate additions, not net of retirements. Gross figures overstate net additions, especially for MISO and ISO-NE. Material 2024 retirements: MISO ~1.8 GW coal (South Oak Creek, Rush Island); ISO-NE 1.4 GW (Mystic CC, June 2024); PJM ~0.6 GW (Homer City coal).
+#### 2023 Capacity (EIA-860M)
+
+| ISO | Nameplate MW | ELCC MW | Key breakdown |
+|-----|-------------|---------|---------------|
+| PJM | 7,910 | ~4,938 | solar 3,487 / gas CC 3,355 / wind 594 / gas CT 380 / battery 60 |
+| ERCOT | 7,757 | ~3,736 | solar 3,553 / battery 1,924 / wind 1,461 / gas 820 |
+| CAISO | 5,701 | ~3,454 | battery 3,052 / solar 2,545 / wind 95 |
+| MISO | 4,878 | ~2,347 | solar 2,758 / wind 1,386 / gas 690 |
+| SPP | 2,090 | ~476 | wind 1,895 / solar 165 |
+| NYISO | 923 | ~266 | wind 557 / solar 313 / battery 53 |
+| ISO-NE | 404 | ~170 | solar 336 / battery 61 |
+
+**Notable 2023 → 2024 changes:** PJM dropped from 7,910 to 4,079 MW (loss of gas CC cycle); ERCOT nearly doubled from 7,757 to 13,973 MW (solar/battery boom).
+
+**Gross vs. net capacity:** All capacity figures are gross nameplate additions, not net of retirements. Gross figures overstate net additions, especially for MISO and ISO-NE. Material 2024 retirements: MISO ~1.8 GW coal (South Oak Creek, Rush Island); ISO-NE 1.4 GW (Mystic CC, June 2024); PJM ~0.2 GW (Warrior Run coal/cogen, June 2024).
 
 ### ELCC-Weighted Capacity
 
@@ -104,8 +118,8 @@ Nameplate MW overstates variable resources for reliability purposes. 1 MW of sol
 | Onshore wind | 15–25% | Low correlation with summer peak; higher for winter-peaking systems |
 
 **ISO-specific accreditation:** The generic factors above are starting points, but ISO-level ELCC figures use ISO-specific accreditation values where available:
-- **MISO**: Summer solar capacity credit of ~50% (MISO Planning Resource Auction rules), not the generic 30–35%. This explains MISO's 3,300 MW ELCC from 7,500 MW nameplate (~6.7 GW solar).
-- **SPP**: Wind ELCC per SPP's own ELCC study (~20–25% for existing fleet); battery at ~90%. SPP's 1,675 MW ELCC from 2,500 MW nameplate reflects the wind-heavy mix with SPP-specific factors.
+- **MISO**: Summer solar capacity credit of ~50% (MISO Planning Resource Auction rules), not the generic 30–35%. This explains MISO's ~3,500 MW ELCC from 7,156 MW nameplate (~6.3 GW solar).
+- **SPP**: Wind ELCC per SPP's own ELCC study (~20–25% for existing fleet); battery at ~90%. SPP's ~271 MW ELCC from 1,142 MW nameplate reflects the wind-heavy mix with SPP-specific factors.
 - **CAISO**: Battery at 85–90% (4-hour duration); solar at ~30% (high penetration saturation).
 - **ERCOT**: Solar ~30%, battery ~85%, gas 95% — close to generic factors.
 
@@ -113,13 +127,13 @@ ELCC varies significantly by ISO, season, and penetration level. These are **est
 
 | ISO | Nameplate MW | ELCC MW | MW/GW (Nameplate) | MW/GW (ELCC) |
 |-----|-------------|---------|-------------------|--------------|
-| ERCOT | 18,700 | ~9,800 | 219.5 | ~115.0 |
-| CAISO | 7,500 | ~4,640 | 155.3 | ~96.1 |
-| MISO | 7,500 | ~3,300 | 61.7 | ~27.1 |
-| SPP | 2,500 | ~1,675 | 46.3 | ~31.0 |
-| NYISO | 950 | ~570 | 32.8 | ~19.7 |
-| PJM | 4,800 | ~1,650 | 31.4 | ~10.8 |
-| ISO-NE | 400 | ~200 | 16.4 | ~8.2 |
+| ERCOT | 13,973 | ~6,773 | 164.0 | ~79.5 |
+| CAISO | 6,535 | ~4,064 | 135.3 | ~84.1 |
+| MISO | 7,156 | ~3,501 | 58.8 | ~28.8 |
+| NYISO | 1,069 | ~363 | 36.9 | ~12.5 |
+| PJM | 4,079 | ~1,420 | 26.7 | ~9.3 |
+| SPP | 1,142 | ~271 | 21.1 | ~5.0 |
+| ISO-NE | 525 | ~230 | 21.5 | ~9.4 |
 
 ### Peak Demand (GW)
 
@@ -144,7 +158,7 @@ Share of projects entering the interconnection queue that reach commercial opera
 | ISO | Rate | Cohort | Source |
 |-----|------|--------|--------|
 | ERCOT | 42.6% | 2018–2020 | Brattle/AEU Scorecard |
-| MISO | 28% | 2000–2019 | Brattle/AEU Scorecard (28.3% for 2018–2020 cohort); LBNL Queued Up (aggregate) |
+| MISO | 28% | 2018–2020 | Brattle/AEU Scorecard (28.3% for 2018–2020 cohort) |
 | SPP | 15% | 2000–2019 | LBNL; Brattle |
 | PJM | 12% | 2000–2019 | LBNL; RMI |
 | CAISO | 10% | 2000–2019 | Concentric Energy Advisors; LBNL |
@@ -191,13 +205,13 @@ supply_response = capacity_additions_mw / peak_demand_gw
 
 | ISO | Nameplate MW/GW | ELCC MW/GW |
 |-----|----------------|------------|
-| ERCOT | 219.5 | ~115.0 |
-| CAISO | 155.3 | ~96.1 |
-| MISO | 61.7 | ~27.1 |
-| SPP | 46.3 | ~31.0 |
-| NYISO | 32.8 | ~19.7 |
-| PJM | 31.4 | ~10.8 |
-| ISO-NE | 16.4 | ~8.2 |
+| ERCOT | 164.0 | ~79.5 |
+| CAISO | 135.3 | ~84.1 |
+| MISO | 58.8 | ~28.8 |
+| NYISO | 36.9 | ~12.5 |
+| PJM | 26.7 | ~9.3 |
+| ISO-NE | 21.5 | ~9.4 |
+| SPP | 21.1 | ~5.0 |
 
 ### Bubble Sizing
 
@@ -217,6 +231,53 @@ radius = sqrt_scale(peak_demand_gw, domain=[24, 153], range=[14px, 48px])
 
 **SPP reclassification:** SPP was previously grouped as "functional" but its 15% queue completion rate and 46.3 MW/GW supply response are closer to PJM than to ERCOT. Reclassified to "intermediate" for accuracy.
 
+## Multi-Year Timeline
+
+The chart supports viewing 2023, 2024, and 2025 estimates, controlled by a year toggle. In ISO view, all three years are available (2023, 2024, 2025 est.). In state view, 2023 and 2024 are available. A play/pause button auto-advances through years to animate the temporal story.
+
+### Why multi-year?
+
+The strongest evidence for the thesis is temporal:
+- **ERCOT**: $55.50 → $27.33 as capacity nearly doubled (7.8 GW → 14.0 GW)
+- **PJM**: $31.08 → $33.74 wholesale, and capacity cost is about to explode (BRA 2025/26 at $269.92/MW-day)
+- **MISO**: Capacity cost spiking from ~$2/MWh to ~$9/MWh (PRA 2025/26 at $217.50/MW-day, 10× increase)
+- **ISO-NE / NYISO**: Prices rising, additions negligible
+
+### Data source unification
+
+Both 2023 and 2024 capacity data use **EIA-860M January 2026 vintage** as the single source of truth. This ensures consistent methodology across years. Industry sources may report higher figures due to filing lag (see filing-lag caveat in capacity section).
+
+### 2025 estimates (ISO view)
+
+Two ISOs have locked-in capacity market results that dramatically change their all-in cost picture:
+
+**PJM:** The BRA 2025/26 cleared at $269.92/MW-day (~$18/MWh capacity adder), which is contractually binding. Other components are estimated:
+- Wholesale: ~$34/MWh (similar to 2024)
+- All-in: ~$52/MWh (wholesale + $18/MWh capacity)
+- Capacity additions: ~4,000 MW (queue still clogged)
+- Peak demand: ~155 GW (trending up from 152.6)
+
+**MISO:** The PRA 2025/26 cleared at $217.50/MW-day annualized (~$9/MWh capacity adder, a 10× increase from 2024). Summer peak reached $666.50/MW-day (22× increase). Other components are estimated:
+- Wholesale: ~$31/MWh (similar to 2024)
+- All-in: ~$40/MWh (wholesale + $9/MWh capacity)
+- Capacity additions: ~7,000 MW (similar to 2024)
+- Peak demand: ~123 GW
+
+MISO's capacity shortfall is structural — retirements outpacing additions in key zones, exacerbated by growing data center and electrification demand.
+
+Both 2025 estimate points are rendered with dashed outlines and reduced opacity to distinguish them from observed data.
+
+### State multi-year data (2023 & 2024)
+
+State-level data supports 2023 and 2024 (no 2025 state data — EIA retail prices for 2025 expected ~Aug 2026, full EIA-860M capacity data ~Jan 2027).
+
+**2023 state data sources:**
+- **Capacity additions:** EIA-860M January 2026 vintage, grouped by Plant State field
+- **Retail prices:** EIA State Electricity Profiles, 2023 average retail price (all sectors, cents/kWh)
+- **Wholesale prices:** Inherited from parent ISO's 2023 wholesale price
+- **Peak demand:** Uses 2024 peak demand as proxy (~1–2% YoY variation; state-level coincident peak data for 2023 not separately sourced)
+- **Queue completion:** Same cohort-based rates as 2024 (not annual metrics)
+
 ## Caveats
 
 1. **Temporal causality**: ERCOT's 2024 price ($27/MWh) is the *result* of the supply response — down from $55/MWh in 2023. The massive 2024 buildout was triggered by 2021–2023 price signals and scarcity events (including Winter Storm Uri). The chart shows a snapshot; the causal chain runs from past prices to current building to future price moderation.
@@ -229,7 +290,7 @@ radius = sqrt_scale(peak_demand_gw, domain=[24, 153], range=[14px, 48px])
 
 5. **Nameplate vs. effective capacity**: Using nameplate MW overstates variable resources (solar, wind) relative to firm capacity. The ELCC toggle provides estimated effective capacity for comparison.
 
-6. **Gross vs. net capacity**: All capacity figures are gross nameplate additions, not net of retirements. Gross figures overstate net additions, especially for MISO and ISO-NE. Specific 2024 retirements: MISO ~1.8 GW coal (South Oak Creek, Rush Island); ISO-NE 1.4 GW (Mystic CC, June 2024); PJM ~0.6 GW (Homer City coal).
+6. **Gross vs. net capacity**: All capacity figures are gross nameplate additions, not net of retirements. Gross figures overstate net additions, especially for MISO and ISO-NE. Specific 2024 retirements: MISO ~1.8 GW coal (South Oak Creek, Rush Island); ISO-NE 1.4 GW (Mystic CC, June 2024); PJM ~0.2 GW (Warrior Run coal/cogen, June 2024).
 
 7. **ERCOT peak demand**: 85.2 GW (settled data, Aug 20, 2024). The preliminary real-time value of 85.6 GW was revised down. This is slightly below the 2023 record of 85.5 GW — not an all-time record.
 
@@ -241,7 +302,7 @@ The "building barriers → high prices" thesis has real explanatory power but is
 
 1. **SPP**: Low prices despite low queue completion (15%). SPP benefits from abundant wind resource and cheap fuel (gas, coal). Low queue completion hasn't prevented enough capacity from entering to keep prices low — the resource endowment does heavy lifting.
 
-2. **CAISO**: High building (7,500 MW, 155 MW/GW) despite low queue completion (10%). California's additions are driven by state mandates (SB 100) and utility procurement obligations, not wholesale price signals. This shows that policy can override queue dysfunction as a building driver.
+2. **CAISO**: High building (6,535 MW, 135 MW/GW) despite low queue completion (10%). California's additions are driven by state mandates (SB 100) and utility procurement obligations, not wholesale price signals. This shows that policy can override queue dysfunction as a building driver.
 
 3. **ISO-NE**: High prices substantially driven by winter natural gas spikes and pipeline constraints (plus RGGI carbon costs), not solely building barriers. Even with a functional queue, ISO-NE's prices would remain elevated due to fuel mix exposure. The correlation between low queue completion and high prices is partly spurious here.
 

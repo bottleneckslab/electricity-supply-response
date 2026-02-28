@@ -61,17 +61,18 @@ export function MethodologyNotes({ granularity }: Props) {
               <ul style={{ listStyle: "disc", paddingLeft: 20, margin: 0 }}>
                 <li style={LI_STYLE}>
                   State capacity additions from EIA-860M "Plant State" field — counts all generators
-                  reaching commercial operation in 2024, regardless of which ISO the plant's Balancing
-                  Authority belongs to.
+                  reaching commercial operation in the selected year, regardless of which ISO the plant's
+                  Balancing Authority belongs to. Data available for 2023 and 2024.
                 </li>
                 <li style={LI_STYLE}>
                   State peak demand from EIA-861 Annual Electric Power Industry Report (coincident state peak).
+                  2023 view uses 2024 peak demand as proxy (~1–2% YoY variation).
                 </li>
                 <li style={LI_STYLE}>
-                  Y-axis uses EIA average retail electricity prices (2024, all sectors, cents/kWh). Retail
-                  prices include generation, transmission, distribution, taxes, and regulatory charges —
-                  giving each state an independent value. Wholesale prices (from parent ISO) are shown in
-                  the tooltip for reference.
+                  Y-axis uses EIA average retail electricity prices (selected year, all sectors, cents/kWh).
+                  Retail prices include generation, transmission, distribution, taxes, and regulatory
+                  charges — giving each state an independent value. Wholesale prices (from parent ISO) are
+                  shown in the tooltip for reference.
                 </li>
                 <li style={LI_STYLE}>
                   Queue completion rates are ISO-level estimates unless LBNL project-level data includes
@@ -89,6 +90,33 @@ export function MethodologyNotes({ granularity }: Props) {
               </ul>
             </>
           )}
+
+          <h4 style={HEADING_STYLE}>Multi-year data</h4>
+          <ul style={{ listStyle: "disc", paddingLeft: 20, margin: 0 }}>
+            <li style={LI_STYLE}>
+              <strong>Capacity additions (2023 & 2024):</strong> sourced from EIA-860M January 2026 vintage
+              — a single federal source providing consistent methodology across both years. Industry sources
+              report higher figures for some ISOs (e.g., ~18.7 GW for ERCOT 2024 vs. 14.0 GW in EIA-860M),
+              likely due to filing lag in the monthly generator inventory.
+            </li>
+            <li style={LI_STYLE}>
+              <strong>2023 prices:</strong> ERCOT, SPP, PJM, and ISO-NE from market monitor State of the
+              Market reports (high confidence). MISO, CAISO, and NYISO are estimates derived from all-in
+              figures minus capacity adders (medium confidence, marked in tooltip).
+            </li>
+            <li style={LI_STYLE}>
+              <strong>PJM 2025 estimate:</strong> The BRA 2025/26 cleared at $269.92/MW-day (~$18/MWh
+              capacity adder) — this price is locked in. Wholesale energy is estimated at ~$34/MWh (similar
+              to 2024). All-in ~$52/MWh. Capacity additions estimated at ~4,000 MW (queue still clogged).
+              Shown with dashed outline to distinguish from observed data.
+            </li>
+            <li style={LI_STYLE}>
+              <strong>MISO 2025 estimate:</strong> The PRA 2025/26 cleared at $217.50/MW-day annualized
+              (~$9/MWh capacity adder, a 10× increase from 2024). Summer peak reached $666.50/MW-day
+              (22× increase). Wholesale estimated at ~$31/MWh, all-in ~$40/MWh. MISO's capacity shortfall
+              is structural — retirements outpacing additions in key zones.
+            </li>
+          </ul>
 
           <h4 style={HEADING_STYLE}>Data sources & comparability</h4>
           <ul style={{ listStyle: "disc", paddingLeft: 20, margin: 0 }}>
@@ -118,7 +146,7 @@ export function MethodologyNotes({ granularity }: Props) {
               All capacity figures are gross nameplate MW additions, not net of retirements. Gross
               figures overstate net additions, especially for MISO and ISO-NE. Material 2024
               retirements: MISO ~1.8 GW coal (South Oak Creek, Rush Island); ISO-NE 1.4 GW
-              (Mystic CC, June 2024); PJM ~0.6 GW (Homer City coal).
+              (Mystic CC, June 2024); PJM ~0.2 GW (Warrior Run coal/cogen, June 2024).
             </li>
             <li style={LI_STYLE}>
               Nameplate MW overstates variable resources. 1 MW solar does not equal 1 MW gas for

@@ -1,9 +1,10 @@
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { Group } from "@visx/group";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { GridRows, GridColumns } from "@visx/grid";
 import { useTooltip } from "@visx/tooltip";
 import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel } from "../lib/types";
+import type { YearKey } from "../App";
 import { createScales, getXValue, getXLabel, getXSubtitle, getYValue, getYLabel } from "../lib/scales";
 import { GROUP_FILLS, GROUP_STROKES } from "../lib/colors";
 import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
@@ -22,14 +23,29 @@ const MAX_WIDTH = 820;
  */
 type ViewKey = "queue" | "capacity" | "capacity_elcc";
 
-const LABEL_OFFSETS: Record<string, Record<ViewKey, [number, number]>> = {
-  ERCOT:    { capacity: [15, -30],  capacity_elcc: [15, -30],  queue: [15, -22] },
-  SPP:      { capacity: [15, -18],  capacity_elcc: [15, -18],  queue: [15, -18] },
-  MISO:     { capacity: [15, -10],  capacity_elcc: [15, -10],  queue: [15, 8] },
-  CAISO:    { capacity: [-55, -20], capacity_elcc: [-55, -20], queue: [-55, -15] },
-  PJM:      { capacity: [58, -15],  capacity_elcc: [15, -22],  queue: [30, -55] },
-  NYISO:    { capacity: [15, -22],  capacity_elcc: [15, -22],  queue: [-52, -10] },
-  "ISO-NE": { capacity: [-15, -18], capacity_elcc: [-15, -18], queue: [-52, 8] },
+const LABEL_OFFSETS: Record<string, Record<string, Record<ViewKey, [number, number]>>> = {
+  "2024": {
+    ERCOT:    { capacity: [15, -30],  capacity_elcc: [15, -30],  queue: [15, -22] },
+    SPP:      { capacity: [15, -18],  capacity_elcc: [15, -18],  queue: [15, -18] },
+    MISO:     { capacity: [15, -10],  capacity_elcc: [15, -10],  queue: [15, 8] },
+    CAISO:    { capacity: [-55, -20], capacity_elcc: [-55, -20], queue: [-55, -15] },
+    PJM:      { capacity: [58, -15],  capacity_elcc: [15, -22],  queue: [30, -55] },
+    NYISO:    { capacity: [15, -22],  capacity_elcc: [15, -22],  queue: [-52, -10] },
+    "ISO-NE": { capacity: [-15, -18], capacity_elcc: [-15, -18], queue: [-52, 8] },
+  },
+  "2023": {
+    ERCOT:    { capacity: [15, -30],  capacity_elcc: [15, -30],  queue: [15, -22] },
+    SPP:      { capacity: [15, -18],  capacity_elcc: [15, -18],  queue: [15, -18] },
+    MISO:     { capacity: [15, -10],  capacity_elcc: [15, -10],  queue: [15, 8] },
+    CAISO:    { capacity: [-55, -20], capacity_elcc: [-55, -20], queue: [-55, -15] },
+    PJM:      { capacity: [-65, -15], capacity_elcc: [15, -22],  queue: [30, -55] },
+    NYISO:    { capacity: [15, -22],  capacity_elcc: [15, -22],  queue: [-52, -10] },
+    "ISO-NE": { capacity: [-15, -18], capacity_elcc: [-15, -18], queue: [-52, 8] },
+  },
+  "2025": {
+    PJM:      { capacity: [15, -22],  capacity_elcc: [15, -22],  queue: [15, -22] },
+    MISO:     { capacity: [15, -10],  capacity_elcc: [15, -10],  queue: [15, 8] },
+  },
 };
 
 function getViewKey(metric: XAxisMetric, weighting: CapacityWeighting): ViewKey {
@@ -50,16 +66,28 @@ const ISO_BAND_COLORS: Record<string, string> = {
 
 interface Props {
   isoData: ISODataPoint[];
+  allIsoData: ISODataPoint[];
+  isoDataByYear: Record<YearKey, ISODataPoint[]>;
   stateData: ISODataPoint[];
+  allStateData: ISODataPoint[];
+  stateDataByYear: Record<YearKey, ISODataPoint[]>;
+  year: YearKey;
+  availableYears: YearKey[];
+  stateYears: YearKey[];
+  onYearChange: (y: YearKey) => void;
 }
 
-export function ElectricityScatter({ isoData, stateData }: Props) {
+export function ElectricityScatter({
+  isoData, allIsoData, isoDataByYear, stateData, allStateData, stateDataByYear,
+  year, availableYears, stateYears, onYearChange,
+}: Props) {
   const [containerRef, containerWidth] = useContainerWidth();
   const [granularity, setGranularity] = useState<GranularityLevel>("iso");
   const [metric, setMetric] = useState<XAxisMetric>("capacity");
-  const [priceMetric, setPriceMetric] = useState<PriceMetric>("energy");
+  const [priceMetric, setPriceMetric] = useState<PriceMetric>("all_in");
   const [weighting, setWeighting] = useState<CapacityWeighting>("nameplate");
   const [tappedId, setTappedId] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Responsive dimensions
@@ -78,11 +106,45 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
   // Force capacity x-axis in state view (queue completion is ISO-level, not per-state)
   const handleGranularityChange = useCallback((g: GranularityLevel) => {
     setGranularity(g);
-    if (g === "state") setMetric("capacity");
+    if (g === "state") {
+      setMetric("capacity");
+      setPlaying(false);
+      // Snap to 2024 if currently on 2025 (no state data for 2025)
+      if (year === "2025") onYearChange("2024");
+    }
+  }, [year, onYearChange]);
+
+  // Manual year change stops playback
+  const handleYearChange = useCallback((y: YearKey) => {
+    setPlaying(false);
+    onYearChange(y);
+  }, [onYearChange]);
+
+  // Play/pause toggle
+  const handlePlayToggle = useCallback(() => {
+    setPlaying((p) => !p);
   }, []);
 
-  const data = granularity === "state" ? stateData : isoData;
   const isStateView = granularity === "state";
+  const activeYears = isStateView ? stateYears : availableYears;
+
+  // Playback effect — advance through years, loop continuously
+  useEffect(() => {
+    if (!playing) return;
+    const idx = activeYears.indexOf(year);
+    // If current year isn't in active list (e.g. 2025 in state view), jump to first
+    if (idx < 0) {
+      onYearChange(activeYears[0]);
+      return;
+    }
+    const isLast = idx >= activeYears.length - 1;
+    const timer = setTimeout(() => {
+      onYearChange(activeYears[isLast ? 0 : idx + 1]);
+    }, isLast ? 3000 : 2800);
+    return () => clearTimeout(timer);
+  }, [playing, year, activeYears, onYearChange]);
+
+  const data = isStateView ? stateData : isoData;
 
   const {
     showTooltip,
@@ -98,6 +160,9 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
     ? (isStateView ? [4, 18] : [8, 28])
     : undefined;
 
+  // Fixed axes across years for both views
+  const domainData = isStateView ? allStateData : allIsoData;
+
   const { xScale, yScale, rScale, xMax, yMax } = createScales(
     data,
     metric,
@@ -108,6 +173,7 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
     weighting,
     granularity,
     rRangeOverride,
+    domainData,
   );
 
   const handleMouseEnter = useCallback(
@@ -140,6 +206,34 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
     [isCompact, tappedId, hideTooltip, showTooltip, margin.left, margin.top],
   );
 
+  // Build union of all ISOs for transition continuity (ISO view).
+  // Keeps all 7 ISOs in DOM so CSS transitions work when switching years.
+  const isoUnion = useMemo(() => {
+    if (isStateView) return [];
+    const map = new Map<string, ISODataPoint>();
+    // Use 2024 as fallback position for ISOs not in current year
+    for (const d of isoDataByYear["2024"]) map.set(d.id, d);
+    // Override with current year's data
+    for (const d of isoData) map.set(d.id, d);
+    return Array.from(map.values());
+  }, [isStateView, isoData, isoDataByYear]);
+
+  const currentIds = useMemo(() => new Set(isoData.map((d) => d.id)), [isoData]);
+
+  // Build union of all states for transition continuity (state view).
+  const stateUnion = useMemo(() => {
+    if (!isStateView) return [];
+    const map = new Map<string, ISODataPoint>();
+    for (const d of stateDataByYear["2024"]) map.set(d.id, d);
+    for (const d of stateData) map.set(d.id, d);
+    return Array.from(map.values());
+  }, [isStateView, stateData, stateDataByYear]);
+
+  const currentStateIds = useMemo(
+    () => new Set(stateData.map((d) => d.id)),
+    [stateData],
+  );
+
   // Compute ISO bands for state view using min/max retail price per ISO.
   const isoBands = useMemo(() => {
     if (!isStateView) return [];
@@ -169,17 +263,19 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
     });
   }, [isStateView, stateData, priceMetric, granularity, yScale]);
 
-  // Chart title adapts to granularity.
+  // Chart title adapts to granularity and metric.
+  const priceLabel = isStateView
+    ? "Retail Electricity Price"
+    : priceMetric === "all_in" ? "All-In Price" : "Wholesale Price";
+  const supplyLabel = metric === "queue" ? "Queue Completion" : "Supply Response";
   const title = isStateView
-    ? "New Capacity vs. Retail Electricity Price by State"
-    : "New Capacity vs. Wholesale Price Across RTOs/ISOs";
+    ? `${supplyLabel} vs. ${priceLabel} by State`
+    : `${supplyLabel} vs. ${priceLabel} Across RTOs/ISOs`;
 
-  // Bubble legend config
+  // Bubble legend config — concentric circles, bottom-aligned
   const legendItems = isCompact
-    ? (isStateView ? [10, 40] : [50, 150])
-    : (isStateView ? [5, 20, 50] : [25, 80, 150]);
-  const legendSpacing = isCompact ? 48 : 56;
-  const legendWidth = legendItems.length * legendSpacing + 14;
+    ? (isStateView ? [5, 30] : [30, 120])
+    : (isStateView ? [3, 15, 50] : [25, 85, 150]);
 
   return (
     <div ref={containerRef} style={{ position: "relative", width: "100%", maxWidth: MAX_WIDTH }}>
@@ -205,10 +301,10 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
             margin: "2px 0 0",
           }}
         >
-          {getXSubtitle(metric, weighting)}, 2024
+          {getXSubtitle(metric, weighting)}, {year}{year === "2025" ? " (est.)" : ""}
           {isStateView && (
             <span style={{ color: "#999", marginLeft: 8, fontSize: isCompact ? 9 : 11 }}>
-              State retail prices from EIA (2024 avg, all sectors)
+              State retail prices from EIA ({year} avg, all sectors)
             </span>
           )}
         </p>
@@ -222,10 +318,15 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
           xMetric={metric}
           yMetric={priceMetric}
           weighting={weighting}
+          year={year}
+          availableYears={activeYears}
+          playing={playing}
           onGranularityChange={handleGranularityChange}
           onXChange={setMetric}
           onYChange={setPriceMetric}
           onWeightingChange={setWeighting}
+          onYearChange={handleYearChange}
+          onPlayToggle={handlePlayToggle}
         />
       </div>
 
@@ -278,71 +379,118 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
             </g>
           ))}
 
-          {/* Bubbles */}
-          {data.map((d) => {
+          {/* ISO view bubbles — with animated transitions */}
+          {!isStateView && isoUnion.map((baseD) => {
+            const isActive = currentIds.has(baseD.id);
+            const d = isoData.find((curr) => curr.id === baseD.id) ?? baseD;
             const cx = xScale(getXValue(d, metric, weighting)) ?? 0;
             const cy = yScale(getYValue(d, priceMetric, granularity)) ?? 0;
             const r = rScale(d.peak_demand_gw);
+            const isEst = d.isEstimate === true;
+            const [dx, dy] = LABEL_OFFSETS[year]?.[d.id]?.[getViewKey(metric, weighting)]
+              ?? LABEL_OFFSETS["2024"]?.[d.id]?.[getViewKey(metric, weighting)]
+              ?? [15, -15];
             return (
-              <g key={d.id}>
+              <g
+                key={d.id}
+                style={{
+                  transform: `translate(${cx}px, ${cy}px)`,
+                  transition: "transform 1.8s ease-in-out, opacity 1s ease",
+                  opacity: isActive ? 1 : 0,
+                  pointerEvents: isActive ? "auto" : "none",
+                }}
+              >
                 <circle
-                  cx={cx}
-                  cy={cy}
                   r={r}
                   fill={GROUP_FILLS[d.color_group]}
-                  fillOpacity={isStateView ? 0.45 : 0.55}
+                  fillOpacity={isEst ? 0.20 : 0.55}
                   stroke={GROUP_STROKES[d.color_group]}
-                  strokeWidth={isStateView ? 1 : 1.5}
-                  style={{ cursor: "pointer", transition: "all 0.2s ease" }}
+                  strokeWidth={isEst ? 2 : 1.5}
+                  strokeDasharray={isEst ? "4,3" : undefined}
+                  style={{ cursor: "pointer", transition: "r 0.4s ease" }}
                   onMouseEnter={isCompact ? undefined : () => handleMouseEnter(d, cx, cy)}
                   onMouseLeave={isCompact ? undefined : hideTooltip}
                   onClick={() => handleBubbleClick(d, cx, cy)}
                 />
+                {/* "2025 est." annotation for estimated points */}
+                {isEst && !isCompact && (
+                  <text
+                    x={r + 6}
+                    y={-r + 2}
+                    fontFamily={FONT.body}
+                    fontSize={10}
+                    fontStyle="italic"
+                    fontWeight={600}
+                    fill={GROUP_STROKES[d.color_group]}
+                    opacity={0.7}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    2025 est.
+                  </text>
+                )}
+                {/* Direct label */}
+                {!isCompact && (
+                  <text
+                    x={dx}
+                    y={dy}
+                    fontFamily={FONT.body}
+                    fontSize={12}
+                    fontWeight={600}
+                    fill={GROUP_STROKES[d.color_group]}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    {d.id}
+                  </text>
+                )}
               </g>
             );
           })}
 
-          {/* Direct labels — ISO view only, hidden on compact */}
-          {!isStateView && !isCompact && data.map((d) => {
-            const cx = xScale(getXValue(d, metric, weighting)) ?? 0;
-            const cy = yScale(getYValue(d, priceMetric, granularity)) ?? 0;
-            const [dx, dy] = LABEL_OFFSETS[d.id]?.[getViewKey(metric, weighting)] ?? [15, -15];
-            return (
-              <text
-                key={`label-${d.id}`}
-                x={cx + dx}
-                y={cy + dy}
-                fontFamily={FONT.body}
-                fontSize={12}
-                fontWeight={600}
-                fill={GROUP_STROKES[d.color_group]}
-                style={{ pointerEvents: "none" }}
-              >
-                {d.id}
-              </text>
-            );
-          })}
-
-          {/* State view: small 2-letter code near each bubble — hidden on compact */}
-          {isStateView && !isCompact && data.map((d) => {
+          {/* State view bubbles — with animated transitions */}
+          {isStateView && stateUnion.map((baseD) => {
+            const isActive = currentStateIds.has(baseD.id);
+            const d = stateData.find((curr) => curr.id === baseD.id) ?? baseD;
             const cx = xScale(getXValue(d, metric, weighting)) ?? 0;
             const cy = yScale(getYValue(d, priceMetric, granularity)) ?? 0;
             const r = rScale(d.peak_demand_gw);
             return (
-              <text
-                key={`state-label-${d.id}`}
-                x={cx}
-                y={cy - r - 3}
-                textAnchor="middle"
-                fontFamily={FONT.body}
-                fontSize={9}
-                fontWeight={600}
-                fill={GROUP_STROKES[d.color_group]}
-                opacity={0.7}
-                style={{ pointerEvents: "none" }}
+              <g
+                key={d.id}
+                style={{
+                  transform: `translate(${cx}px, ${cy}px)`,
+                  transition: "transform 1.8s ease-in-out, opacity 1s ease",
+                  opacity: isActive ? 1 : 0,
+                  pointerEvents: isActive ? "auto" : "none",
+                }}
               >
-                {d.id}
-              </text>
+                <circle
+                  r={r}
+                  fill={GROUP_FILLS[d.color_group]}
+                  fillOpacity={0.45}
+                  stroke={GROUP_STROKES[d.color_group]}
+                  strokeWidth={1}
+                  style={{ cursor: "pointer", transition: "r 0.4s ease" }}
+                  onMouseEnter={isCompact ? undefined : () => handleMouseEnter(d, cx, cy)}
+                  onMouseLeave={isCompact ? undefined : hideTooltip}
+                  onClick={() => handleBubbleClick(d, cx, cy)}
+                />
+                {/* State label */}
+                {!isCompact && (
+                  <text
+                    x={0}
+                    y={-r - 3}
+                    textAnchor="middle"
+                    fontFamily={FONT.body}
+                    fontSize={9}
+                    fontWeight={600}
+                    fill={GROUP_STROKES[d.color_group]}
+                    opacity={0.7}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    {d.id}
+                  </text>
+                )}
+              </g>
             );
           })}
 
@@ -408,43 +556,93 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
           />
         </Group>
 
-        {/* Bubble size legend — upper-right of chart area */}
-        <Group top={margin.top + 8} left={margin.left + xMax - legendWidth}>
-          <text
-            fontFamily={FONT.body}
-            fontSize={isCompact ? 9 : 10}
-            fill="#999"
-            dy={-6}
-          >
-            Bubble size = {isStateView ? "state" : "system"} peak demand
-          </text>
-          {legendItems.map((gw, i) => {
-            const r = rScale(gw);
-            const cx = i * legendSpacing + 14;
-            return (
-              <g key={gw}>
-                <circle
-                  cx={cx}
-                  cy={16}
-                  r={r * 0.4}
-                  fill="none"
-                  stroke="#bbb"
-                  strokeWidth={1}
-                />
-                <text
-                  x={cx}
-                  y={34}
-                  textAnchor="middle"
-                  fontFamily={FONT.body}
-                  fontSize={9}
-                  fill="#aaa"
-                >
-                  {gw} GW
-                </text>
-              </g>
-            );
-          })}
-        </Group>
+        {/* Bubble size legend — concentric circles, upper-right of chart area */}
+        {(() => {
+          const maxR = rScale(legendItems[legendItems.length - 1]);
+          const legendW = maxR * 2 + 50;
+          const legendCx = maxR;
+          const legendBottom = maxR * 2 + 4;
+          return (
+            <Group top={margin.top + 8} left={margin.left + xMax - legendW}>
+              <text
+                fontFamily={FONT.body}
+                fontSize={isCompact ? 9 : 10}
+                fill="#999"
+                dy={-6}
+              >
+                Bubble size = {isStateView ? "state" : "system"} peak demand
+              </text>
+              {legendItems.map((gw) => {
+                const r = rScale(gw);
+                const cy = legendBottom - r;
+                return (
+                  <g key={gw}>
+                    <circle
+                      cx={legendCx}
+                      cy={cy}
+                      r={r}
+                      fill="none"
+                      stroke="#bbb"
+                      strokeWidth={1}
+                    />
+                    {/* Dashed line from top of circle to label */}
+                    <line
+                      x1={legendCx + r}
+                      y1={cy - r}
+                      x2={legendCx + maxR + 4}
+                      y2={cy - r}
+                      stroke="#ccc"
+                      strokeWidth={0.5}
+                      strokeDasharray="2,2"
+                    />
+                    <text
+                      x={legendCx + maxR + 7}
+                      y={cy - r}
+                      dominantBaseline="central"
+                      fontFamily={FONT.body}
+                      fontSize={9}
+                      fill="#aaa"
+                    >
+                      {gw} GW
+                    </text>
+                  </g>
+                );
+              })}
+            </Group>
+          );
+        })()}
+
+        {/* Estimated point legend — only when estimated data is visible */}
+        {data.some((d) => d.isEstimate) && (() => {
+          const maxLegendR = rScale(legendItems[legendItems.length - 1]);
+          const estTop = margin.top + 8 + maxLegendR * 2 + 16;
+          const estLeft = margin.left + xMax - maxLegendR * 2 - 50;
+          return (
+            <Group top={estTop} left={estLeft}>
+              <circle
+                cx={8}
+                cy={4}
+                r={6}
+                fill="none"
+                stroke="#8073ac"
+                strokeWidth={1.5}
+                strokeDasharray="4,3"
+              />
+              <text
+                x={20}
+                y={4}
+                dominantBaseline="central"
+                fontFamily={FONT.body}
+                fontSize={isCompact ? 9 : 10}
+                fontStyle="italic"
+                fill="#999"
+              >
+                Estimated
+              </text>
+            </Group>
+          );
+        })()}
+
       </svg>
 
       {/* Tooltip */}
@@ -455,6 +653,7 @@ export function ElectricityScatter({ isoData, stateData }: Props) {
           priceMetric={priceMetric}
           weighting={weighting}
           granularity={granularity}
+          year={year}
           top={tooltipTop ?? 0}
           left={tooltipLeft ?? 0}
         />

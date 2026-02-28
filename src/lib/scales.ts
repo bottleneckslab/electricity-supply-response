@@ -48,13 +48,15 @@ export function createScales(
   weighting?: CapacityWeighting,
   granularity?: GranularityLevel,
   rRangeOverride?: [number, number],
+  domainData?: ISODataPoint[],
 ) {
   const xMax = width - margin.left - margin.right;
   const yMax = height - margin.top - margin.bottom;
 
-  const xValues = data.map((d) => getXValue(d, metric, weighting));
-  const priceValues = data.map((d) => getYValue(d, priceMetric, granularity));
-  const peakValues = data.map((d) => d.peak_demand_gw);
+  const forDomain = domainData ?? data;
+  const xValues = forDomain.map((d) => getXValue(d, metric, weighting));
+  const priceValues = forDomain.map((d) => getYValue(d, priceMetric, granularity));
+  const peakValues = forDomain.map((d) => d.peak_demand_gw);
 
   // X-axis: capacity metric (supply response)
   const xScale = scaleLinear<number>({
