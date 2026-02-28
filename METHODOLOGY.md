@@ -113,7 +113,7 @@ ELCC varies significantly by ISO, season, and penetration level. These are **est
 
 | ISO | Nameplate MW | ELCC MW | MW/GW (Nameplate) | MW/GW (ELCC) |
 |-----|-------------|---------|-------------------|--------------|
-| ERCOT | 18,700 | ~9,800 | 218.5 | ~114.5 |
+| ERCOT | 18,700 | ~9,800 | 219.5 | ~115.0 |
 | CAISO | 7,500 | ~4,640 | 155.3 | ~96.1 |
 | MISO | 7,500 | ~3,300 | 61.7 | ~27.1 |
 | SPP | 2,500 | ~1,675 | 46.3 | ~31.0 |
@@ -191,7 +191,7 @@ supply_response = capacity_additions_mw / peak_demand_gw
 
 | ISO | Nameplate MW/GW | ELCC MW/GW |
 |-----|----------------|------------|
-| ERCOT | 218.5 | ~114.5 |
+| ERCOT | 219.5 | ~115.0 |
 | CAISO | 155.3 | ~96.1 |
 | MISO | 61.7 | ~27.1 |
 | SPP | 46.3 | ~31.0 |
