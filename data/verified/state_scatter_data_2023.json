@@ -2,7 +2,7 @@
   "metadata": {
     "title": "US State-Level Electricity Supply Response Data — 2023",
     "author": "Bottlenecks Lab",
-    "compiled": "2026-02-28",
+    "compiled": "2023",
     "primary_year": 2023,
     "notes": "State-level 2023 data: capacity from EIA-860M Jan 2026 vintage (operating year 2023), retail prices from EIA State Electricity Profiles 2023, wholesale prices inherited from parent ISO 2023 market monitor reports. Peak demand uses 2024 values as proxy (changes <2% YoY). Queue completion rates are cohort-based (same as 2024)."
   },
@@ -20,7 +20,9 @@
       "peak_demand_gw": 85.2,
       "queue_completion_pct": 42.6,
       "queue_cohort": "2018–2020",
+      "avg_queue_duration_months": 32,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Single-state ISO. Energy-only market with streamlined interconnection drove 18.7 GW of additions in 2024 — more than any other state.",
       "sources": {
         "price": "Inherited from ERCOT 2023 wholesale market",
@@ -42,7 +44,9 @@
       "peak_demand_gw": 48.3,
       "queue_completion_pct": 10,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 54,
       "color_group": "intermediate",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Single-state ISO. Battery storage leader (4.2 GW in 2024). Additions driven by SB 100 mandates, not price signals.",
       "sources": {
         "price": "Inherited from CAISO 2023 wholesale market",
@@ -64,7 +68,9 @@
       "peak_demand_gw": 22.0,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Restrictive",
       "qualitative_note": "SB 52 (2021) gave townships veto power over wind and solar. Local opposition slowing renewable siting despite PJM queue.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -86,7 +92,9 @@
       "peak_demand_gw": 25.2,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Spans MISO (Ameren IL) and PJM (ComEd). Strong solar buildout downstate. CEJA (Climate and Equitable Jobs Act) driving utility-scale solar.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -108,7 +116,9 @@
       "peak_demand_gw": 12.4,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Moderate solar growth. We Energies and Alliant driving utility-scale projects.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -130,7 +140,9 @@
       "peak_demand_gw": 29.0,
       "queue_completion_pct": 10,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 52,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Single-state ISO. Extreme NYC vs upstate price divergence. CLCPA mandates but siting friction (Article 10) stalls projects.",
       "sources": {
         "price": "Inherited from NYISO 2023 wholesale market",
@@ -152,7 +164,9 @@
       "peak_demand_gw": 7.8,
       "queue_completion_pct": 15,
       "queue_cohort": "ISO-level (SPP)",
+      "avg_queue_duration_months": 45,
       "color_group": "intermediate",
+      "siting_regime": "Permissive",
       "qualitative_note": "Wind-dominant. Strong capacity additions relative to system size. Rural siting generally permissive.",
       "sources": {
         "price": "Inherited from SPP 2023 wholesale market",
@@ -174,7 +188,9 @@
       "peak_demand_gw": 20.5,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Permissive",
       "qualitative_note": "Data center capital of the world (Loudoun County). VCEA mandates driving massive solar procurement. Dominion Energy's offshore wind project (2.6 GW) under construction.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -196,7 +212,9 @@
       "peak_demand_gw": 16.8,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Spans MISO and PJM. Solar replacing retiring coal. Data center demand growing in central Indiana.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -218,7 +236,9 @@
       "peak_demand_gw": 11.5,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Spans MISO (LG&E) and PJM (EKPC, DEOK). Coal-dependent state with slow transition.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -240,7 +260,9 @@
       "peak_demand_gw": 14.3,
       "queue_completion_pct": 15,
       "queue_cohort": "ISO-level (SPP)",
+      "avg_queue_duration_months": 45,
       "color_group": "intermediate",
+      "siting_regime": "Permissive",
       "qualitative_note": "Major wind state with excellent resource. Growing solar and battery co-location. Permitting generally favorable.",
       "sources": {
         "price": "Inherited from SPP 2023 wholesale market",
@@ -262,7 +284,9 @@
       "peak_demand_gw": 7.1,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Emerging solar market. Entergy Mississippi driving utility-scale solar procurement.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -284,7 +308,9 @@
       "peak_demand_gw": 30.0,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Large system but moderate buildout relative to peak. Solar growth in south-central PA. Gas generation well-established.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -306,7 +332,9 @@
       "peak_demand_gw": 22.0,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Spans MISO (most of state) and PJM (small zone). 100% clean energy law passed 2023 driving solar expansion.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -328,7 +356,9 @@
       "peak_demand_gw": 3.8,
       "queue_completion_pct": 15,
       "queue_cohort": "ISO-level (SPP)",
+      "avg_queue_duration_months": 45,
       "color_group": "intermediate",
+      "siting_regime": "Permissive",
       "qualitative_note": "Spans SPP and non-ISO territory. Energy Transition Act driving coal replacement with solar and wind.",
       "sources": {
         "price": "Inherited from SPP 2023 wholesale market",
@@ -350,7 +380,9 @@
       "peak_demand_gw": 5.8,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Small PJM footprint (Duke Carolinas). Most NC generation is outside organized markets. HB 951 driving solar growth.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -372,7 +404,9 @@
       "peak_demand_gw": 8.0,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Spans MISO (Entergy) and SPP. Solar growing but still modest.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -394,7 +428,9 @@
       "peak_demand_gw": 8.2,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Wind energy leader (~60% of generation from wind). Data center growth in Des Moines metro driving new demand.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -416,7 +452,9 @@
       "peak_demand_gw": 14.8,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Spans MISO (Entergy) and SPP. Gas-heavy additions serving LNG export and petrochemical load growth.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -438,7 +476,9 @@
       "peak_demand_gw": 10.5,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Permissive",
       "qualitative_note": "Strong wind resource. Xcel Energy driving clean energy portfolio. Legislature passed 100% clean energy standard.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -460,7 +500,9 @@
       "peak_demand_gw": 2.0,
       "queue_completion_pct": 8,
       "queue_cohort": "ISO-level (ISO-NE)",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Strong wind resource but local opposition. Rejected CMP transmission corridor. Small market limits utility-scale development.",
       "sources": {
         "price": "Inherited from ISO-NE 2023 wholesale market",
@@ -482,7 +524,9 @@
       "peak_demand_gw": 1.8,
       "queue_completion_pct": 8,
       "queue_cohort": "ISO-level (ISO-NE)",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Tiny land area limits utility-scale projects. Block Island Wind Farm was first US offshore wind (30 MW). Act on Climate goals unmatched by buildout.",
       "sources": {
         "price": "Inherited from ISO-NE 2023 wholesale market",
@@ -504,7 +548,9 @@
       "peak_demand_gw": 19.5,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Aggressive offshore wind targets (11 GW by 2040). Land-constrained — most solar is community/rooftop scale.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -526,7 +572,9 @@
       "peak_demand_gw": 6.3,
       "queue_completion_pct": 8,
       "queue_cohort": "ISO-level (ISO-NE)",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "High prices, minimal building. Offshore wind procurement delays. Land-constrained for utility-scale solar. Next-Gen RFPs proceeding slowly.",
       "sources": {
         "price": "Inherited from ISO-NE 2023 wholesale market",
@@ -548,7 +596,9 @@
       "peak_demand_gw": 12.3,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Clean energy mandate (50% by 2030) driving solar. Data center growth in Frederick/Montgomery counties.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -570,7 +620,9 @@
       "peak_demand_gw": 2.2,
       "queue_completion_pct": 8,
       "queue_cohort": "ISO-level (ISO-NE)",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Minimal new development. Northern Pass transmission rejected. Limited policy support for renewables.",
       "sources": {
         "price": "Inherited from ISO-NE 2023 wholesale market",
@@ -592,7 +644,9 @@
       "peak_demand_gw": 1.0,
       "queue_completion_pct": 8,
       "queue_cohort": "ISO-level (ISO-NE)",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Smallest New England state by demand. Strong Act 250 environmental review limits siting. Most generation is distributed/community solar.",
       "sources": {
         "price": "Inherited from ISO-NE 2023 wholesale market",
@@ -614,7 +668,9 @@
       "peak_demand_gw": 5.2,
       "queue_completion_pct": 15,
       "queue_cohort": "ISO-level (SPP)",
+      "avg_queue_duration_months": 45,
       "color_group": "intermediate",
+      "siting_regime": "Permissive",
       "qualitative_note": "Public power state (NPPD, OPPD). Wind additions steady. Unique ownership structure (no IOUs).",
       "sources": {
         "price": "Inherited from SPP 2023 wholesale market",
@@ -636,7 +692,9 @@
       "peak_demand_gw": 15.0,
       "queue_completion_pct": 28,
       "queue_cohort": "ISO-level (MISO)",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Spans MISO (Ameren MO) and SPP. Ameren driving solar procurement to replace coal retirements.",
       "sources": {
         "price": "Inherited from MISO 2023 wholesale market",
@@ -658,7 +716,9 @@
       "peak_demand_gw": 5.5,
       "queue_completion_pct": 8,
       "queue_cohort": "ISO-level (ISO-NE)",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Highest electricity costs in New England. Siting challenges for both onshore and offshore wind.",
       "sources": {
         "price": "Inherited from ISO-NE 2023 wholesale market",
@@ -680,7 +740,9 @@
       "peak_demand_gw": 5.5,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Restrictive",
       "qualitative_note": "Coal-dependent. Very limited renewable development. State policy hostile to wind siting.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",
@@ -702,7 +764,9 @@
       "peak_demand_gw": 2.3,
       "queue_completion_pct": 12,
       "queue_cohort": "ISO-level (PJM)",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
+      "siting_regime": "Moderate Friction",
       "qualitative_note": "Small state with limited land for utility-scale projects.",
       "sources": {
         "price": "Inherited from PJM 2023 wholesale market",

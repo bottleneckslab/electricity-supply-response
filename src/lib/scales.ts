@@ -59,8 +59,10 @@ export function createScales(
   const peakValues = forDomain.map((d) => d.peak_demand_gw);
 
   // X-axis: capacity metric (supply response)
+  const xRawMax = Math.max(...xValues) * 1.15;
+  const xDomainMax = granularity === "state" ? Math.min(xRawMax, 240) : xRawMax;
   const xScale = scaleLinear<number>({
-    domain: [0, Math.max(...xValues) * 1.15],
+    domain: [0, xDomainMax],
     range: [0, xMax],
     nice: true,
   });

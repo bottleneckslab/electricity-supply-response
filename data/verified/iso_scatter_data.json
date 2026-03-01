@@ -2,7 +2,7 @@
   "metadata": {
     "title": "US ISO/RTO Electricity Supply Response Data",
     "author": "Bottlenecks Lab",
-    "compiled": "2026-02-28",
+    "compiled": "2024",
     "primary_year": 2024,
     "notes": "Prices are 2024 annual averages from ISO market monitor reports. ERCOT, SPP, and ISO-NE are day-ahead averages; MISO and PJM are real-time load-weighted averages; CAISO and NYISO are estimated from available reports. DA prices are typically $1–3/MWh higher than RT. Capacity additions are gross nameplate MW reaching commercial operation in 2024, sourced from EIA-860M January 2026 vintage (not net of retirements). Industry sources report higher figures for some ISOs — see filing-lag notes. Queue completion rates span 2000–2020 entry cohorts from LBNL Queued Up and Brattle/AEU Scorecard; ERCOT uses a narrower 2018–2020 cohort. Project counts are distinct generators (EIA-860M unit-level) reaching COD in 2024. All-in prices add capacity market payments (RPM, FCA, ICAP, RA, PRA) to energy-only wholesale averages."
   },
@@ -19,6 +19,7 @@
       "peak_demand_gw": 85.2,
       "queue_completion_pct": 42.6,
       "queue_cohort": "2018–2020",
+      "avg_queue_duration_months": 32,
       "price_2023_mwh": 55.5,
       "color_group": "functional",
       "qualitative_note": "Energy-only market with streamlined interconnection. Added ~14 GW in 2024 (EIA-860M) — more than any other ISO — driven by solar, battery, and gas. Queue completion rate 3–5× higher than peers.",
@@ -41,6 +42,7 @@
       "peak_demand_gw": 121.6,
       "queue_completion_pct": 28,
       "queue_cohort": "2018–2020",
+      "avg_queue_duration_months": 50,
       "color_group": "functional",
       "qualitative_note": "Largest US ISO by geographic footprint. Solar installations doubled in 2024. Queue reforms (MTEP cycles) improving throughput, but ~72% of projects still never reach fruition.",
       "sources": {
@@ -62,6 +64,7 @@
       "peak_demand_gw": 48.3,
       "queue_completion_pct": 10,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 54,
       "color_group": "intermediate",
       "qualitative_note": "Battery storage leader — added 3.6 GW of batteries in 2024 (EIA-860M). High additions driven by state mandates, but only ~10% of queue projects reach operation. Duck curve dynamics suppress midday prices.",
       "sources": {
@@ -83,6 +86,7 @@
       "peak_demand_gw": 152.6,
       "queue_completion_pct": 12,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
       "qualitative_note": "Largest US ISO by peak demand. Data center load growth outpacing new supply. Queue backlog of 260+ GW with only 12% completion rate. 'Speed to power' crisis identified by RMI.",
       "sources": {
@@ -104,6 +108,7 @@
       "peak_demand_gw": 54.0,
       "queue_completion_pct": 15,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 45,
       "color_group": "intermediate",
       "qualitative_note": "Wind-dominated resource mix with lowest wholesale prices. Modest new additions in 2024 but historically strong wind buildout. Queue reforms underway.",
       "sources": {
@@ -125,6 +130,7 @@
       "peak_demand_gw": 29.0,
       "queue_completion_pct": 10,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 52,
       "color_group": "broken",
       "qualitative_note": "Extreme zonal price divergence — NYC (Zone J) averages ~$50+/MWh while upstate ~$25. Minimal new supply despite CLCPA mandates. Offshore wind procurement delays and Article 10 siting friction.",
       "sources": {
@@ -146,6 +152,7 @@
       "peak_demand_gw": 24.4,
       "queue_completion_pct": 8,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
       "qualitative_note": "Energy + FCA capacity cost ~$51/MWh (comparable basis). Published $87/MWh total includes RECs, RGGI, ancillary, and transmission. Vineyard Wind blade failure (July 2024) shut down all 136 MW for ~6 months; operational contribution in 2024 was severely limited. Gas dependence + pipeline constraints drive winter price spikes. Worst queue completion rate nationally.",
       "sources": {

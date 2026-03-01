@@ -8,6 +8,8 @@ export type PriceMetric = "energy" | "all_in";
 
 export type CapacityWeighting = "nameplate" | "elcc";
 
+export type ViewTab = "capacity" | "queue" | "state";
+
 export interface ISODataPoint {
   id: string;
   name: string;
@@ -25,6 +27,8 @@ export interface ISODataPoint {
   isEstimate?: boolean;
   confidence?: string;
   color_group: ColorGroup;
+  siting_regime?: string;
+  avg_queue_duration_months?: number;
   qualitative_note: string;
   sources: {
     price: string;
@@ -55,7 +59,3 @@ export function capacityPerGwPeakElcc(d: ISODataPoint): number {
   return (d.capacity_additions_elcc_mw ?? d.capacity_additions_mw) / d.peak_demand_gw;
 }
 
-/** Derived metric: distinct generators per GW of system peak */
-export function projectsPerGwPeak(d: ISODataPoint): number {
-  return d.project_count / d.peak_demand_gw;
-}

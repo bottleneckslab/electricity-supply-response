@@ -13,10 +13,12 @@ CSV_PATH = os.path.join(DATA_DIR, "audit_all_data.csv")
 
 REQUIRED_COLUMNS = [
     "view", "year", "id", "name", "region", "is_estimate", "color_group",
+    "siting_regime",
     "confidence", "wholesale_price_mwh", "all_in_price_mwh",
     "retail_price_cents_kwh", "price_2023_mwh",
     "capacity_additions_mw", "capacity_additions_elcc_mw", "project_count",
     "peak_demand_gw", "queue_completion_pct", "queue_cohort",
+    "avg_queue_duration_months",
     "qualitative_note",
     "source_price", "source_capacity", "source_peak", "source_queue",
 ]
@@ -29,6 +31,7 @@ NUMERIC_FIELDS = [
     "wholesale_price_mwh", "all_in_price_mwh", "retail_price_cents_kwh",
     "price_2023_mwh", "capacity_additions_mw", "capacity_additions_elcc_mw",
     "project_count", "peak_demand_gw", "queue_completion_pct",
+    "avg_queue_duration_months",
 ]
 
 SOURCE_COLUMNS = ["source_price", "source_capacity", "source_peak", "source_queue"]

@@ -9,7 +9,6 @@ The CSV is the single source of truth. JSON files are build artifacts.
 import csv
 import json
 import os
-from datetime import date
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 VERIFIED_DIR = os.path.join(DATA_DIR, "verified")
@@ -149,6 +148,10 @@ def build_record(row):
     rec["queue_completion_pct"] = parse_num(row["queue_completion_pct"])
     rec["queue_cohort"] = row["queue_cohort"]
 
+    aqd = parse_num(row.get("avg_queue_duration_months", ""), as_int=True)
+    if aqd is not None:
+        rec["avg_queue_duration_months"] = aqd
+
     # price_2023_mwh: only for iso 2024 rows
     p2023 = parse_num(row.get("price_2023_mwh", ""))
     if p2023 is not None:
@@ -165,6 +168,10 @@ def build_record(row):
         rec["confidence"] = confidence
 
     rec["color_group"] = row["color_group"]
+
+    sr = row.get("siting_regime", "")
+    if sr:
+        rec["siting_regime"] = sr
 
     # qualitative_note
     qn = row.get("qualitative_note", "")
@@ -213,7 +220,7 @@ def main():
         metadata = {
             "title": meta_template["title"],
             "author": meta_template["author"],
-            "compiled": date.today().isoformat(),
+            "compiled": str(meta_template["primary_year"]),
             "primary_year": meta_template["primary_year"],
             "notes": meta_template["notes"],
         }

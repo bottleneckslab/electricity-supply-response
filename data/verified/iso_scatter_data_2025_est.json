@@ -2,7 +2,7 @@
   "metadata": {
     "title": "US ISO/RTO Electricity Supply Response Data — 2025 Estimate",
     "author": "Bottlenecks Lab",
-    "compiled": "2026-02-28",
+    "compiled": "2025",
     "primary_year": 2025,
     "notes": "PJM and MISO estimates. Both ISOs have locked-in capacity auction results for 2025/26 delivery year. PJM BRA at $269.92/MW-day (~$18/MWh adder, 9× increase). MISO PRA at $217/MW-day annualized (~$9/MWh adder, 10× increase; summer peak $666.50/MW-day, 22× increase). Wholesale prices and capacity additions estimated at levels similar to 2024."
   },
@@ -19,6 +19,7 @@
       "peak_demand_gw": 123.0,
       "queue_completion_pct": 28,
       "queue_cohort": "2018–2020",
+      "avg_queue_duration_months": 50,
       "isEstimate": true,
       "confidence": "PRA 2025/26 locked in. Summer $666.50/MW-day (22× increase). Annualized ~$217/MW-day (~$9/MWh capacity adder, 10× increase). Wholesale and capacity additions estimated.",
       "color_group": "functional",
@@ -42,6 +43,7 @@
       "peak_demand_gw": 155.0,
       "queue_completion_pct": 12,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 60,
       "isEstimate": true,
       "confidence": "BRA 2025/26 locked in at $269.92/MW-day (~$18/MWh capacity adder). Wholesale and capacity additions estimated.",
       "color_group": "intermediate",

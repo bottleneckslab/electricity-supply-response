@@ -1,42 +1,36 @@
-import type { XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel } from "../lib/types";
+import type { ViewTab, PriceMetric, CapacityWeighting } from "../lib/types";
 import type { YearKey } from "../App";
 import { FONT } from "../lib/theme";
 
 interface Props {
   compact?: boolean;
-  granularity: GranularityLevel;
-  xMetric: XAxisMetric;
-  yMetric: PriceMetric;
+  viewTab: ViewTab;
+  priceMetric: PriceMetric;
   weighting: CapacityWeighting;
   year: YearKey;
   availableYears: YearKey[];
   playing: boolean;
-  onGranularityChange: (g: GranularityLevel) => void;
-  onXChange: (m: XAxisMetric) => void;
-  onYChange: (m: PriceMetric) => void;
+  onViewTabChange: (t: ViewTab) => void;
+  onPriceMetricChange: (m: PriceMetric) => void;
   onWeightingChange: (w: CapacityWeighting) => void;
   onYearChange: (y: YearKey) => void;
   onPlayToggle: () => void;
 }
 
-const granularityOptions: { value: GranularityLevel; label: string }[] = [
-  { value: "iso", label: "RTO/ISO" },
-  { value: "state", label: "State" },
+const tabOptions: { value: ViewTab; label: string }[] = [
+  { value: "capacity", label: "RTO/ISO Capacity \u00d7 Price" },
+  { value: "queue", label: "RTO/ISO Queue \u00d7 Price" },
+  { value: "state", label: "State Capacity \u00d7 Price" },
 ];
 
-const xOptions: { value: XAxisMetric; label: string }[] = [
-  { value: "capacity", label: "New Capacity (MW / GW peak)" },
-  { value: "queue", label: "Queue Completion Rate (%)" },
-];
-
-const yOptions: { value: PriceMetric; label: string }[] = [
-  { value: "energy", label: "Energy-Only Price" },
-  { value: "all_in", label: "All-In Price (Energy + Capacity)" },
+const priceOptions: { value: PriceMetric; label: string }[] = [
+  { value: "energy", label: "Energy-Only" },
+  { value: "all_in", label: "All-In" },
 ];
 
 const weightingOptions: { value: CapacityWeighting; label: string }[] = [
-  { value: "nameplate", label: "Nameplate MW" },
-  { value: "elcc", label: "ELCC-Estimated" },
+  { value: "nameplate", label: "Nameplate" },
+  { value: "elcc", label: "ELCC" },
 ];
 
 const yearLabels: Record<YearKey, string> = {
@@ -84,16 +78,14 @@ function ToggleButton<T extends string>({
 
 export function ChartControls({
   compact,
-  granularity,
-  xMetric,
-  yMetric,
+  viewTab,
+  priceMetric,
   weighting,
   year,
   availableYears,
   playing,
-  onGranularityChange,
-  onXChange,
-  onYChange,
+  onViewTabChange,
+  onPriceMetricChange,
   onWeightingChange,
   onYearChange,
   onPlayToggle,
@@ -115,6 +107,8 @@ export function ChartControls({
   const btnPadding = compact ? "3px 10px" : "4px 14px";
   const btnFontSize = compact ? 11.5 : 12.5;
 
+  const isIsoView = viewTab !== "state";
+
   return (
     <div
       style={{
@@ -125,20 +119,21 @@ export function ChartControls({
         fontSize: compact ? 11 : 13,
       }}
     >
+      {/* Primary tabs */}
       <div style={rowStyle}>
-        <span style={labelStyle}>View by:</span>
-        {granularityOptions.map((o) => (
+        {tabOptions.map((o) => (
           <ToggleButton
             key={o.value}
             value={o.value}
             label={o.label}
-            active={granularity === o.value}
-            onClick={onGranularityChange}
+            active={viewTab === o.value}
+            onClick={onViewTabChange}
             padding={btnPadding}
             fontSize={btnFontSize}
           />
         ))}
       </div>
+      {/* Year */}
       <div style={rowStyle}>
         <span style={labelStyle}>Year:</span>
         {availableYears.map((y) => (
@@ -154,64 +149,33 @@ export function ChartControls({
         ))}
         <button
           onClick={onPlayToggle}
-            title={playing ? "Pause" : "Play through years"}
-            style={{
-              marginLeft: 8,
-              padding: compact ? "3px 8px" : "4px 10px",
-              border: "1px solid",
-              borderColor: playing ? "#2a9d8f" : "#ccc",
-              borderRadius: 4,
-              background: playing ? "rgba(42, 157, 143, 0.08)" : "#fff",
-              color: playing ? "#2a9d8f" : "#888",
-              fontFamily: FONT.body,
-              fontSize: compact ? 13 : 14,
-              fontWeight: 400,
-              cursor: "pointer",
-              transition: "all 0.15s ease",
-              lineHeight: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: compact ? 28 : 32,
-              height: compact ? 24 : 28,
-            }}
-          >
-            {playing ? "⏸" : "▶"}
-          </button>
+          title={playing ? "Pause" : "Play through years"}
+          style={{
+            marginLeft: 8,
+            padding: compact ? "3px 8px" : "4px 10px",
+            border: "1px solid",
+            borderColor: playing ? "#2a9d8f" : "#ccc",
+            borderRadius: 4,
+            background: playing ? "rgba(42, 157, 143, 0.08)" : "#fff",
+            color: playing ? "#2a9d8f" : "#888",
+            fontFamily: FONT.body,
+            fontSize: compact ? 13 : 14,
+            fontWeight: 400,
+            cursor: "pointer",
+            transition: "all 0.15s ease",
+            lineHeight: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: compact ? 28 : 32,
+            height: compact ? 24 : 28,
+          }}
+        >
+          {playing ? "\u23F8" : "\u25B6"}
+        </button>
       </div>
-      {granularity !== "state" && (
-        <div style={rowStyle}>
-          <span style={labelStyle}>X-axis:</span>
-          {xOptions.map((o) => (
-            <ToggleButton
-              key={o.value}
-              value={o.value}
-              label={o.label}
-              active={xMetric === o.value}
-              onClick={onXChange}
-              padding={btnPadding}
-              fontSize={btnFontSize}
-            />
-          ))}
-        </div>
-      )}
-      {granularity !== "state" && (
-        <div style={rowStyle}>
-          <span style={labelStyle}>Y-axis:</span>
-          {yOptions.map((o) => (
-            <ToggleButton
-              key={o.value}
-              value={o.value}
-              label={o.label}
-              active={yMetric === o.value}
-              onClick={onYChange}
-              padding={btnPadding}
-              fontSize={btnFontSize}
-            />
-          ))}
-        </div>
-      )}
-      {xMetric === "capacity" && (
+      {/* Capacity basis — capacity + state tabs */}
+      {viewTab !== "queue" && (
         <div style={rowStyle}>
           <span style={labelStyle}>Capacity basis:</span>
           {weightingOptions.map((o) => (
@@ -221,6 +185,23 @@ export function ChartControls({
               label={o.label}
               active={weighting === o.value}
               onClick={onWeightingChange}
+              padding={btnPadding}
+              fontSize={btnFontSize}
+            />
+          ))}
+        </div>
+      )}
+      {/* Price basis — ISO tabs only (capacity + queue) */}
+      {isIsoView && (
+        <div style={rowStyle}>
+          <span style={labelStyle}>Price basis:</span>
+          {priceOptions.map((o) => (
+            <ToggleButton
+              key={o.value}
+              value={o.value}
+              label={o.label}
+              active={priceMetric === o.value}
+              onClick={onPriceMetricChange}
               padding={btnPadding}
               fontSize={btnFontSize}
             />

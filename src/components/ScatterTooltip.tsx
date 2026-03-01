@@ -1,9 +1,9 @@
 import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
 import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel } from "../lib/types";
 import type { YearKey } from "../App";
-import { capacityPerGwPeak, capacityPerGwPeakElcc, projectsPerGwPeak } from "../lib/types";
+import { capacityPerGwPeak, capacityPerGwPeakElcc } from "../lib/types";
 import { FONT } from "../lib/theme";
-import { GROUP_FILLS } from "../lib/colors";
+import { GROUP_FILLS, SITING_FILLS } from "../lib/colors";
 
 interface Props {
   data: ISODataPoint;
@@ -50,7 +50,9 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
           fontWeight: 700,
           fontSize: 14,
           marginBottom: 2,
-          color: GROUP_FILLS[data.color_group],
+          color: isStateView
+            ? (SITING_FILLS[data.siting_regime || ""] || GROUP_FILLS[data.color_group])
+            : GROUP_FILLS[data.color_group],
         }}
       >
         {displayName}
@@ -58,6 +60,11 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
           {yearLabel}
         </span>
       </div>
+      {isStateView && data.siting_regime && (
+        <div style={{ fontSize: 11, color: "#777", marginBottom: 2 }}>
+          {data.siting_regime}
+        </div>
+      )}
       {isEst && (
         <div style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", marginBottom: 4 }}>
           Estimated — {data.confidence ?? "projected values"}
@@ -102,12 +109,14 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
               : `${capacityPerGwPeak(data).toFixed(1)} MW/GW`}
           />
           <Row label="Projects" value={`${data.project_count}`} />
-          <Row label="Per GW peak" value={`${projectsPerGwPeak(data).toFixed(1)} projects/GW`} />
           <Row label="Peak demand" value={`${data.peak_demand_gw.toFixed(1)} GW`} />
           <Row
             label="Queue completion"
             value={`${data.queue_completion_pct}%${data.queue_cohort ? ` (${data.queue_cohort})` : ""}${queueInherited ? " *" : ""}`}
           />
+          {data.avg_queue_duration_months != null && (
+            <Row label="Avg queue duration" value={`${data.avg_queue_duration_months} months`} />
+          )}
           {queueInherited && (
             <tr>
               <td colSpan={2} style={{ color: "#999", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>

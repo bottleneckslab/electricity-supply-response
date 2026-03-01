@@ -2,7 +2,7 @@
   "metadata": {
     "title": "US ISO/RTO Electricity Supply Response Data — 2023",
     "author": "Bottlenecks Lab",
-    "compiled": "2026-02-28",
+    "compiled": "2023",
     "primary_year": 2023,
     "notes": "Capacity additions are gross nameplate MW reaching commercial operation in 2023, sourced from EIA-860M January 2026 vintage. Prices are 2023 annual averages from ISO market monitor reports. MISO, CAISO, and NYISO prices are estimates (marked with confidence field). Queue completion rates are cohort-based (not annual) and identical to the 2024 dataset."
   },
@@ -19,6 +19,7 @@
       "peak_demand_gw": 147.0,
       "queue_completion_pct": 12,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 60,
       "color_group": "intermediate",
       "qualitative_note": "Strong 2023 additions (7.9 GW) driven by gas CC cycle and solar. Prices $31/MWh. Capacity additions dropped to 4.1 GW in 2024 as queue congestion worsened. BRA 2025/26 at $269.92/MW-day signals the coming price shock.",
       "sources": {
@@ -40,6 +41,7 @@
       "peak_demand_gw": 85.5,
       "queue_completion_pct": 42.6,
       "queue_cohort": "2018–2020",
+      "avg_queue_duration_months": 32,
       "color_group": "functional",
       "qualitative_note": "Energy-only market. 2023 prices elevated ($55.50/MWh) before massive 2024 buildout. Supply response in motion — 7.8 GW added in 2023, nearly doubling to ~14 GW in 2024.",
       "sources": {
@@ -61,6 +63,7 @@
       "peak_demand_gw": 44.5,
       "queue_completion_pct": 10,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 54,
       "confidence": "estimated",
       "color_group": "intermediate",
       "qualitative_note": "Battery storage buildout already substantial in 2023 (3 GW). Prices estimated ~$45/MWh DA energy-only (~$65 all-in less RA costs). Mandate-driven additions (SB 100).",
@@ -83,6 +86,7 @@
       "peak_demand_gw": 123.0,
       "queue_completion_pct": 28,
       "queue_cohort": "2018–2020",
+      "avg_queue_duration_months": 50,
       "confidence": "estimated",
       "color_group": "functional",
       "qualitative_note": "Solar buildout accelerating in 2023. Prices ~$35/MWh (RT estimate, ~$37 all-in minus ~$2 PRA). Capacity additions nearly doubled from 2023 to 2024.",
@@ -105,6 +109,7 @@
       "peak_demand_gw": 56.2,
       "queue_completion_pct": 15,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 45,
       "color_group": "intermediate",
       "qualitative_note": "Wind-dominated additions in 2023. Prices stable around $26/MWh. Large wind resource base keeps prices low despite modest queue throughput.",
       "sources": {
@@ -126,6 +131,7 @@
       "peak_demand_gw": 30.2,
       "queue_completion_pct": 10,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 52,
       "confidence": "estimated",
       "color_group": "broken",
       "qualitative_note": "Prices estimated ~$45/MWh wholesale (~$58 all-in minus ~$8 ICAP; zonal avg estimate). Minimal new supply. Offshore wind procurement delays continue.",
@@ -148,6 +154,7 @@
       "peak_demand_gw": 23.5,
       "queue_completion_pct": 8,
       "queue_cohort": "2000–2019",
+      "avg_queue_duration_months": 56,
       "color_group": "broken",
       "qualitative_note": "Lower prices in 2023 ($36.82) than 2024 ($41.47) — 13% YoY increase. Minimal additions. Gas dependence + pipeline constraints drive winter spikes.",
       "sources": {

@@ -3,10 +3,10 @@ import { Group } from "@visx/group";
 import { AxisBottom, AxisLeft } from "@visx/axis";
 import { GridRows, GridColumns } from "@visx/grid";
 import { useTooltip } from "@visx/tooltip";
-import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel } from "../lib/types";
+import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel, ViewTab } from "../lib/types";
 import type { YearKey } from "../App";
 import { createScales, getXValue, getXLabel, getXSubtitle, getYValue, getYLabel } from "../lib/scales";
-import { GROUP_FILLS, GROUP_STROKES } from "../lib/colors";
+import { GROUP_FILLS, GROUP_STROKES, SITING_FILLS, SITING_STROKES } from "../lib/colors";
 import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
 import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
@@ -82,13 +82,16 @@ export function ElectricityScatter({
   year, availableYears, stateYears, onYearChange,
 }: Props) {
   const [containerRef, containerWidth] = useContainerWidth();
-  const [granularity, setGranularity] = useState<GranularityLevel>("iso");
-  const [metric, setMetric] = useState<XAxisMetric>("capacity");
+  const [viewTab, setViewTab] = useState<ViewTab>("capacity");
   const [priceMetric, setPriceMetric] = useState<PriceMetric>("all_in");
   const [weighting, setWeighting] = useState<CapacityWeighting>("nameplate");
   const [tappedId, setTappedId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  // Derive granularity and metric from viewTab
+  const granularity: GranularityLevel = viewTab === "state" ? "state" : "iso";
+  const metric: XAxisMetric = viewTab === "queue" ? "queue" : "capacity";
 
   // Responsive dimensions
   const width = containerWidth > 0 ? Math.min(containerWidth, MAX_WIDTH) : MAX_WIDTH;
@@ -103,11 +106,10 @@ export function ElectricityScatter({
 
   const height = isCompact ? 320 : isMid ? Math.round(width * 0.65) : 580;
 
-  // Force capacity x-axis in state view (queue completion is ISO-level, not per-state)
-  const handleGranularityChange = useCallback((g: GranularityLevel) => {
-    setGranularity(g);
-    if (g === "state") {
-      setMetric("capacity");
+  // Handle tab changes — snap year if needed
+  const handleViewTabChange = useCallback((t: ViewTab) => {
+    setViewTab(t);
+    if (t === "state") {
       setPlaying(false);
       // Snap to 2024 if currently on 2025 (no state data for 2025)
       if (year === "2025") onYearChange("2024");
@@ -314,16 +316,14 @@ export function ElectricityScatter({
       <div style={{ marginBottom: 4, paddingLeft: margin.left }}>
         <ChartControls
           compact={isCompact}
-          granularity={granularity}
-          xMetric={metric}
-          yMetric={priceMetric}
+          viewTab={viewTab}
+          priceMetric={priceMetric}
           weighting={weighting}
           year={year}
           availableYears={activeYears}
           playing={playing}
-          onGranularityChange={handleGranularityChange}
-          onXChange={setMetric}
-          onYChange={setPriceMetric}
+          onViewTabChange={handleViewTabChange}
+          onPriceMetricChange={setPriceMetric}
           onWeightingChange={setWeighting}
           onYearChange={handleYearChange}
           onPlayToggle={handlePlayToggle}
@@ -446,13 +446,15 @@ export function ElectricityScatter({
             );
           })}
 
-          {/* State view bubbles — with animated transitions */}
+          {/* State view bubbles — with animated transitions, colored by siting regime */}
           {isStateView && stateUnion.map((baseD) => {
             const isActive = currentStateIds.has(baseD.id);
             const d = stateData.find((curr) => curr.id === baseD.id) ?? baseD;
             const cx = xScale(getXValue(d, metric, weighting)) ?? 0;
             const cy = yScale(getYValue(d, priceMetric, granularity)) ?? 0;
             const r = rScale(d.peak_demand_gw);
+            const bubbleFill = SITING_FILLS[d.siting_regime || ""] || "#999";
+            const bubbleStroke = SITING_STROKES[d.siting_regime || ""] || "#666";
             return (
               <g
                 key={d.id}
@@ -465,9 +467,9 @@ export function ElectricityScatter({
               >
                 <circle
                   r={r}
-                  fill={GROUP_FILLS[d.color_group]}
+                  fill={bubbleFill}
                   fillOpacity={0.45}
-                  stroke={GROUP_STROKES[d.color_group]}
+                  stroke={bubbleStroke}
                   strokeWidth={1}
                   style={{ cursor: "pointer", transition: "r 0.4s ease" }}
                   onMouseEnter={isCompact ? undefined : () => handleMouseEnter(d, cx, cy)}
@@ -483,7 +485,7 @@ export function ElectricityScatter({
                     fontFamily={FONT.body}
                     fontSize={9}
                     fontWeight={600}
-                    fill={GROUP_STROKES[d.color_group]}
+                    fill={bubbleStroke}
                     opacity={0.7}
                     style={{ pointerEvents: "none" }}
                   >
@@ -639,6 +641,45 @@ export function ElectricityScatter({
               >
                 Estimated
               </text>
+            </Group>
+          );
+        })()}
+
+        {/* Color legend — hidden on compact */}
+        {!isCompact && (() => {
+          const colorLegendItems = isStateView
+            ? [
+                { label: "Permissive", fill: SITING_FILLS["Permissive"], stroke: SITING_STROKES["Permissive"] },
+                { label: "Moderate Friction", fill: SITING_FILLS["Moderate Friction"], stroke: SITING_STROKES["Moderate Friction"] },
+                { label: "Restrictive", fill: SITING_FILLS["Restrictive"], stroke: SITING_STROKES["Restrictive"] },
+              ]
+            : [
+                { label: "Functional", fill: GROUP_FILLS.functional, stroke: GROUP_STROKES.functional },
+                { label: "Intermediate", fill: GROUP_FILLS.intermediate, stroke: GROUP_STROKES.intermediate },
+                { label: "Broken", fill: GROUP_FILLS.broken, stroke: GROUP_STROKES.broken },
+              ];
+          let cx = 0;
+          return (
+            <Group top={height - 10} left={margin.left}>
+              {colorLegendItems.map((item) => {
+                const x = cx;
+                cx += item.label.length * 6.5 + 24;
+                return (
+                  <g key={item.label}>
+                    <circle cx={x + 5} cy={0} r={5} fill={item.fill} fillOpacity={0.55} stroke={item.stroke} strokeWidth={1} />
+                    <text
+                      x={x + 14}
+                      y={0}
+                      dominantBaseline="central"
+                      fontFamily={FONT.body}
+                      fontSize={10}
+                      fill="#666"
+                    >
+                      {item.label}
+                    </text>
+                  </g>
+                );
+              })}
             </Group>
           );
         })()}

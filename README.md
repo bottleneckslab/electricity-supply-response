@@ -15,42 +15,27 @@ Open http://localhost:5173. The chart renders immediately using the curated data
 
 ## Regenerating Data
 
-The curated JSON is committed so the chart works out of the box. To regenerate from raw sources:
+The curated JSON is committed so the chart works out of the box. The single source of truth is `data/audit_all_data.csv`.
 
-### 1. Download raw files
-
-Place in `data/raw/`:
-
-| File | Source | URL |
-|------|--------|-----|
-| EIA wholesale prices | EIA Wholesale Market data | eia.gov → Electricity → Wholesale Markets |
-| EIA-860M | Monthly generator inventory | eia.gov/electricity/data/eia860m/ |
-| LBNL Queued Up | Interconnection queue data | emp.lbl.gov/queues |
-
-### 2. Set API key
+### Workflow
 
 ```bash
-export EIA_API_KEY=your_key_here
+# 1. Edit data/audit_all_data.csv
+# 2. Validate
+npm run data:validate
+# 3. Rebuild JSON from CSV
+npm run data:build
+# 4. (Optional) Generate HTML audit table
+npm run data:audit
 ```
 
-Required for peak demand data (the only metric available via API).
-
-### 3. Run pipeline
-
-```bash
-pip install -e .
-python data/build_dataset.py
-```
-
-The pipeline will skip any source with missing raw files and warn accordingly.
-
-See [METHODOLOGY.md](METHODOLOGY.md) for data sources, calculations, and caveats.
+See [DATA_SOURCES.md](DATA_SOURCES.md) for authoritative sources and annual refresh procedure.
 
 ## Tech Stack
 
 - **Chart**: [visx](https://airbnb.io/visx/) (React + D3 primitives) for full SVG control
 - **Build**: Vite + TypeScript
-- **Data pipeline**: Python + pandas
+- **Data pipeline**: Python (CSV → JSON, no external dependencies)
 
 ## Author
 

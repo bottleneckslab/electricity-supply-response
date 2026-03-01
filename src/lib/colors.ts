@@ -12,8 +12,14 @@ export const GROUP_STROKES: Record<ColorGroup, string> = {
   broken: "#b2182b",
 };
 
-export const SHADED_REGION = {
-  fill: "rgba(214, 96, 77, 0.06)",
-  stroke: "#b2182b",
-  strokeDasharray: "6 4",
+export const SITING_FILLS: Record<string, string> = {
+  "Permissive": "#4393c3",          // steel blue
+  "Moderate Friction": "#8073ac",   // muted purple
+  "Restrictive": "#d6604d",         // warm red
+};
+
+export const SITING_STROKES: Record<string, string> = {
+  "Permissive": "#2166ac",
+  "Moderate Friction": "#5e4fa2",
+  "Restrictive": "#b2182b",
 };
