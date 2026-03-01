@@ -16,6 +16,11 @@
 - `npm run data:validate` — Check CSV for errors
 - `npm run data:audit` — Generate HTML audit table
 
+## Deploy
+
+- **GitHub Pages**: `npm run build && npx gh-pages -d dist`
+- **URL**: https://bottleneckslab.github.io/electricity-supply-response/
+
 ## Stack
 
 React 18 + TypeScript + visx (D3 wrapper) + Vite. No backend.
