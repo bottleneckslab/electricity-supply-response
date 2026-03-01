@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, type RefObject } from "react";
 import { FONT, COLOR } from "../lib/theme";
+import { downloadCsv } from "./SourceDataTable";
 
 const DEPLOY_URL =
   "https://bottleneckslab.github.io/electricity-supply-response/";
@@ -211,7 +212,7 @@ export function ChartToolbar({ svgRef, width, height, compact }: Props) {
               minWidth: 100,
             }}
           >
-            {(["PNG", "SVG"] as const).map((fmt) => (
+            {(["PNG", "SVG", "CSV"] as const).map((fmt) => (
               <button
                 key={fmt}
                 style={{
@@ -234,6 +235,7 @@ export function ChartToolbar({ svgRef, width, height, compact }: Props) {
                 }}
                 onClick={() => {
                   setDownloadOpen(false);
+                  if (fmt === "CSV") { downloadCsv(); return; }
                   if (!svgRef.current) return;
                   if (fmt === "PNG") downloadPng(svgRef.current);
                   else downloadSvg(svgRef.current);
