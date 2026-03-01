@@ -3,7 +3,7 @@ import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, Granula
 import type { YearKey } from "../App";
 import { capacityPerGwPeak, capacityPerGwPeakElcc } from "../lib/types";
 import { FONT } from "../lib/theme";
-import { GROUP_FILLS } from "../lib/colors";
+import { ISO_FILLS } from "../lib/colors";
 
 interface Props {
   data: ISODataPoint;
@@ -50,11 +50,11 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
           fontWeight: 700,
           fontSize: 14,
           marginBottom: 2,
-          color: GROUP_FILLS[data.color_group],
+          color: ISO_FILLS[isStateView ? data.region : data.id] ?? "#333",
         }}
       >
         {displayName}
-        <span style={{ fontWeight: 400, fontSize: 11, color: "#999", marginLeft: 6 }}>
+        <span style={{ fontWeight: 400, fontSize: 11, color: "#767676", marginLeft: 6 }}>
           {yearLabel}
         </span>
       </div>
@@ -95,6 +95,19 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
             label="New capacity"
             value={`${data.capacity_additions_mw.toLocaleString()} MW${showElcc ? ` (${data.capacity_additions_elcc_mw!.toLocaleString()} MW ELCC)` : ""}`}
           />
+          {data.retirements_mw != null && (
+            <Row
+              label="Retirements"
+              value={`${data.retirements_mw.toLocaleString()} MW`}
+            />
+          )}
+          {data.retirements_mw != null && (
+            <Row
+              label="Net additions"
+              value={`${(data.capacity_additions_mw - data.retirements_mw).toLocaleString()} MW`}
+              warning={data.capacity_additions_mw - data.retirements_mw < 0}
+            />
+          )}
           <Row
             label="Per GW peak"
             value={showElcc
@@ -112,15 +125,22 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
           )}
           {queueInherited && (
             <tr>
-              <td colSpan={2} style={{ color: "#999", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
+              <td colSpan={2} style={{ color: "#767676", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
                 * ISO-level estimate — state-level data not available
               </td>
             </tr>
           )}
-          {data.id === "ERCOT" && xMetric === "queue" && !isStateView && (
+          {(data.id === "ERCOT" || data.id === "MISO") && xMetric === "queue" && !isStateView && (
             <tr>
               <td colSpan={2} style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
-                2018–2020 cohort — not directly comparable to 2000–2019 used by other ISOs
+                Brattle 2018–2020 cohort — not directly comparable to LBNL 2000–2019 used by other ISOs
+              </td>
+            </tr>
+          )}
+          {data.id === "TX" && isStateView && (
+            <tr>
+              <td colSpan={2} style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
+                State capacity (18.7 GW) includes unfiled generators. ISO ERCOT view shows 14.0 GW (EIA-860M only).
               </td>
             </tr>
           )}
@@ -144,18 +164,18 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, granular
   );
 }
 
-function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function Row({ label, value, highlight, warning }: { label: string; value: string; highlight?: boolean; warning?: boolean }) {
   return (
     <tr>
-      <td style={{ color: "#888", paddingRight: 12, paddingBottom: 2 }}>{label}</td>
+      <td style={{ color: "#767676", paddingRight: 12, paddingBottom: 2 }}>{label}</td>
       <td
         style={{
           fontWeight: 600,
-          color: highlight ? "#1a1a1a" : "#333",
+          color: warning ? "#b71c1c" : highlight ? "#1a1a1a" : "#333",
           paddingBottom: 2,
-          background: highlight ? "rgba(42, 157, 143, 0.08)" : undefined,
-          borderRadius: highlight ? 2 : undefined,
-          padding: highlight ? "0 4px 2px" : "0 0 2px",
+          background: warning ? "rgba(183, 28, 28, 0.06)" : highlight ? "rgba(42, 157, 143, 0.08)" : undefined,
+          borderRadius: (highlight || warning) ? 2 : undefined,
+          padding: (highlight || warning) ? "0 4px 2px" : "0 0 2px",
         }}
       >
         {value}

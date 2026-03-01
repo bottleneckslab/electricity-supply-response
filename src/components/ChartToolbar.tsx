@@ -116,8 +116,9 @@ const btnStyle: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   gap: 5,
-  padding: "4px 10px",
-  border: "1px solid #ddd",
+  padding: "6px 10px",
+  minHeight: 36,
+  border: "1px solid #999",
   borderRadius: 4,
   background: "#fff",
   color: "#666",
@@ -175,11 +176,11 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
           style={btnStyle}
           onClick={() => setDownloadOpen((v) => !v)}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#aaa";
+            e.currentTarget.style.borderColor = "#767676";
             e.currentTarget.style.color = "#333";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#ddd";
+            e.currentTarget.style.borderColor = "#999";
             e.currentTarget.style.color = "#666";
           }}
         >
@@ -192,7 +193,7 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
               bottom: "calc(100% + 4px)",
               right: 0,
               background: "#fff",
-              border: "1px solid #ddd",
+              border: "1px solid #999",
               borderRadius: 4,
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               zIndex: 10,
@@ -205,7 +206,7 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
                 style={{
                   display: "block",
                   width: "100%",
-                  padding: "6px 14px",
+                  padding: "8px 14px",
                   border: "none",
                   background: "transparent",
                   fontFamily: FONT.body,
@@ -239,11 +240,11 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
         style={btnStyle}
         onClick={handleShare}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "#aaa";
+          e.currentTarget.style.borderColor = "#767676";
           e.currentTarget.style.color = "#333";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "#ddd";
+          e.currentTarget.style.borderColor = "#999";
           e.currentTarget.style.color = "#666";
         }}
       >
@@ -255,11 +256,11 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
         style={btnStyle}
         onClick={handleEmbed}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "#aaa";
+          e.currentTarget.style.borderColor = "#767676";
           e.currentTarget.style.color = "#333";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "#ddd";
+          e.currentTarget.style.borderColor = "#999";
           e.currentTarget.style.color = "#666";
         }}
       >

@@ -21,6 +21,7 @@ REQUIRED_COLUMNS = [
     "avg_queue_duration_months",
     "qualitative_note",
     "source_price", "source_capacity", "source_peak", "source_queue",
+    "retirements_mw",
 ]
 
 VALID_COLOR_GROUPS = {"functional", "intermediate", "broken"}
@@ -32,6 +33,7 @@ NUMERIC_FIELDS = [
     "price_2023_mwh", "capacity_additions_mw", "capacity_additions_elcc_mw",
     "project_count", "peak_demand_gw", "queue_completion_pct",
     "avg_queue_duration_months",
+    "retirements_mw",
 ]
 
 SOURCE_COLUMNS = ["source_price", "source_capacity", "source_peak", "source_queue"]

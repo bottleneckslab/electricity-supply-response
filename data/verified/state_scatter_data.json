@@ -22,7 +22,7 @@
       "queue_cohort": "2018–2020",
       "avg_queue_duration_months": 32,
       "color_group": "functional",
-      "qualitative_note": "Single-state ISO. Energy-only market with streamlined interconnection drove 18.7 GW of additions in 2024 — more than any other state.",
+      "qualitative_note": "TX state view uses industry sources (E3, IEEFA): 18.7 GW. ISO view uses EIA-860M only: 14.0 GW — difference reflects generators not yet filed with EIA. Energy-only market with streamlined interconnection.",
       "sources": {
         "price": "Inherited from ERCOT wholesale market",
         "capacity": "EIA-860M plant state; E3; IEEFA",

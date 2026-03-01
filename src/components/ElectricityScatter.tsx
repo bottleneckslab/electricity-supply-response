@@ -12,6 +12,7 @@ import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
 import { ChartToolbar } from "./ChartToolbar";
 import { MethodologyNotes } from "./MethodologyNotes";
+import { HiddenDataTable } from "./HiddenDataTable";
 import { useContainerWidth } from "../lib/useContainerWidth";
 
 const MAX_WIDTH = 820;
@@ -48,8 +49,8 @@ const LABEL_OFFSETS: Record<string, Record<string, Record<ViewKey, [number, numb
     MISO:     { capacity: [15, -10],  capacity_elcc: [15, -10],  queue: [15, 8] },
     CAISO:    { capacity: [-55, -20], capacity_elcc: [-55, -20], queue: [-55, -15] },
     PJM:      { capacity: [15, -22],  capacity_elcc: [15, -22],  queue: [15, -22] },
-    NYISO:    { capacity: [15, -22],  capacity_elcc: [15, -22],  queue: [-52, -10] },
-    "ISO-NE": { capacity: [-15, -18], capacity_elcc: [-15, -18], queue: [-52, 8] },
+    NYISO:    { capacity: [20, -35],  capacity_elcc: [20, -35],  queue: [-52, -18] },
+    "ISO-NE": { capacity: [-55, -5],  capacity_elcc: [-55, -5],  queue: [-52, 15] },
   },
 };
 
@@ -94,6 +95,15 @@ export function ElectricityScatter({
   const [playing, setPlaying] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
+  const {
+    showTooltip,
+    hideTooltip,
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+  } = useTooltip<ISODataPoint>();
+
   // Derive granularity and metric from viewTab
   const granularity: GranularityLevel = viewTab === "state" ? "state" : "iso";
   const metric: XAxisMetric = viewTab === "queue" ? "queue" : "capacity";
@@ -114,10 +124,12 @@ export function ElectricityScatter({
   // Handle tab changes
   const handleViewTabChange = useCallback((t: ViewTab) => {
     setViewTab(t);
+    hideTooltip();
+    setTappedId(null);
     if (t === "state") {
       setPlaying(false);
     }
-  }, []);
+  }, [hideTooltip]);
 
   // Manual year change stops playback
   const handleYearChange = useCallback((y: YearKey) => {
@@ -150,15 +162,6 @@ export function ElectricityScatter({
   }, [playing, year, activeYears, onYearChange]);
 
   const data = isStateView ? stateData : isoData;
-
-  const {
-    showTooltip,
-    hideTooltip,
-    tooltipData,
-    tooltipLeft,
-    tooltipTop,
-    tooltipOpen,
-  } = useTooltip<ISODataPoint>();
 
   // Smaller bubbles on compact
   const rRangeOverride: [number, number] | undefined = isCompact
@@ -308,7 +311,7 @@ export function ElectricityScatter({
         >
           {getXSubtitle(metric, weighting)}, {year}{year === "2025" ? " (est.)" : ""}
           {isStateView && (
-            <span style={{ color: "#999", marginLeft: 8, fontSize: isCompact ? 9 : 11 }}>
+            <span style={{ color: "#767676", marginLeft: 8, fontSize: isCompact ? 9 : 11 }}>
               State retail prices from EIA ({year} avg, all sectors)
             </span>
           )}
@@ -334,7 +337,14 @@ export function ElectricityScatter({
       </div>
 
       {/* SVG chart */}
-      <svg ref={svgRef} width={width} height={height} style={{ overflow: "visible" }}>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={height}
+        style={{ overflow: "visible" }}
+        role="img"
+        aria-label={`Scatter chart showing ${isStateView ? "state-level capacity" : metric === "queue" ? "queue completion" : "supply response"} versus ${isStateView ? "retail electricity price" : priceMetric === "all_in" ? "all-in price" : "wholesale price"} for ${year}${year === "2025" ? " (estimated)" : ""}`}
+      >
         <Group top={margin.top} left={margin.left}>
           {/* Grid */}
           <GridRows
@@ -396,6 +406,11 @@ export function ElectricityScatter({
             return (
               <g
                 key={d.id}
+                tabIndex={isActive ? 0 : -1}
+                role="button"
+                aria-label={`${d.id}: ${d.capacity_additions_mw.toLocaleString()} MW new capacity, $${d.wholesale_price_mwh.toFixed(0)}/MWh, ${d.peak_demand_gw.toFixed(1)} GW peak demand`}
+                onFocus={() => { if (isActive) handleMouseEnter(d, cx, cy); }}
+                onBlur={() => hideTooltip()}
                 style={{
                   transform: `translate(${cx}px, ${cy}px)`,
                   transition: "transform 1.8s ease-in-out, opacity 1s ease",
@@ -443,6 +458,9 @@ export function ElectricityScatter({
                     style={{ pointerEvents: "none" }}
                   >
                     {d.id}
+                    {metric === "queue" && (d.id === "ERCOT" || d.id === "MISO") && (
+                      <tspan fill="#e65100" fontSize={10} fontWeight={400}>{" \u2020"}</tspan>
+                    )}
                   </text>
                 )}
               </g>
@@ -462,6 +480,11 @@ export function ElectricityScatter({
             return (
               <g
                 key={d.id}
+                tabIndex={isActive ? 0 : -1}
+                role="button"
+                aria-label={`${d.id} (${d.region}): ${d.capacity_additions_mw.toLocaleString()} MW, ${d.retail_price_cents_kwh?.toFixed(1) ?? "—"}¢/kWh retail, ${d.peak_demand_gw.toFixed(1)} GW peak`}
+                onFocus={() => { if (isActive) handleMouseEnter(d, cx, cy); }}
+                onBlur={() => hideTooltip()}
                 style={{
                   transform: `translate(${cx}px, ${cy}px)`,
                   transition: "transform 1.8s ease-in-out, opacity 1s ease",
@@ -481,8 +504,8 @@ export function ElectricityScatter({
                   onMouseLeave={isCompact ? undefined : hideTooltip}
                   onClick={() => handleBubbleClick(d, cx, cy)}
                 />
-                {/* State label */}
-                {!isCompact && (
+                {/* State label — hidden for small bubbles to reduce clutter */}
+                {!isCompact && r > 8 && (
                   <text
                     x={0}
                     y={-r - 3}
@@ -526,9 +549,9 @@ export function ElectricityScatter({
               fontFamily={FONT.body}
               fontSize={9.5}
               fontStyle="italic"
-              fill="#999"
+              fill="#767676"
             >
-              * ERCOT: 2018–2020 cohort (Brattle/AEU); all others: 2000–2019 (LBNL Queued Up)
+              † ERCOT & MISO: 2018–2020 cohort (Brattle/AEU); all others: 2000–2019 (LBNL Queued Up)
             </text>
           )}
           {!isCompact && metric === "queue" && isStateView && (
@@ -539,7 +562,7 @@ export function ElectricityScatter({
               fontFamily={FONT.body}
               fontSize={9.5}
               fontStyle="italic"
-              fill="#999"
+              fill="#767676"
             >
               Queue completion rates are ISO-level estimates inherited by states within each ISO
             </text>
@@ -574,7 +597,7 @@ export function ElectricityScatter({
               <text
                 fontFamily={FONT.body}
                 fontSize={isCompact ? 9 : 10}
-                fill="#999"
+                fill="#767676"
                 dy={-6}
               >
                 Bubble size = {isStateView ? "state" : "system"} peak demand
@@ -608,7 +631,7 @@ export function ElectricityScatter({
                       dominantBaseline="central"
                       fontFamily={FONT.body}
                       fontSize={9}
-                      fill="#aaa"
+                      fill="#767676"
                     >
                       {gw} GW
                     </text>
@@ -642,7 +665,7 @@ export function ElectricityScatter({
                 fontFamily={FONT.body}
                 fontSize={isCompact ? 9 : 10}
                 fontStyle="italic"
-                fill="#999"
+                fill="#767676"
               >
                 Estimated
               </text>
@@ -689,6 +712,16 @@ export function ElectricityScatter({
 
       </svg>
 
+      {/* Hidden data table for screen readers */}
+      <HiddenDataTable
+        data={data}
+        metric={metric}
+        priceMetric={priceMetric}
+        weighting={weighting}
+        granularity={granularity}
+        year={year}
+      />
+
       {/* Tooltip */}
       {tooltipOpen && tooltipData && (
         <ScatterTooltip
@@ -726,13 +759,13 @@ export function ElectricityScatter({
             style={{
               fontFamily: FONT.body,
               fontSize: 9,
-              color: "#aaa",
+              color: "#767676",
               flex: isCompact ? "1 1 100%" : undefined,
             }}
           >
             Data: EIA, ISO Market Monitor Reports, LBNL Queued Up 2025
             {isCompact && metric === "queue" && !isStateView &&
-              " (ERCOT: 2018–20 cohort via Brattle; others: 2000–19 via LBNL)"}
+              " (ERCOT/MISO: 2018–20 cohort via Brattle; others: 2000–19 via LBNL)"}
             {isCompact && metric === "queue" && isStateView &&
               " (queue rates are ISO-level estimates)"}
           </span>

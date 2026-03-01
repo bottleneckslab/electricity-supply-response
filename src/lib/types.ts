@@ -18,6 +18,7 @@ export interface ISODataPoint {
   all_in_price_mwh: number;
   capacity_additions_mw: number;
   capacity_additions_elcc_mw?: number;
+  retirements_mw?: number;
   project_count: number;
   peak_demand_gw: number;
   queue_completion_pct: number;

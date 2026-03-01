@@ -160,6 +160,10 @@ def build_record(row):
     if elcc is not None:
         rec["capacity_additions_elcc_mw"] = elcc
 
+    retirements = parse_num(row.get("retirements_mw", ""), as_int=True)
+    if retirements is not None:
+        rec["retirements_mw"] = retirements
+
     rec["project_count"] = parse_num(row["project_count"], as_int=True)
     rec["peak_demand_gw"] = parse_num(row["peak_demand_gw"])
     rec["queue_completion_pct"] = parse_num(row["queue_completion_pct"])

@@ -13,7 +13,7 @@ const HEADING_STYLE: React.CSSProperties = {
 const TEXT_STYLE: React.CSSProperties = {
   fontFamily: FONT.body,
   fontSize: 11,
-  color: "#777",
+  color: "#767676",
   lineHeight: 1.6,
   margin: "0 0 4px",
 };
@@ -43,7 +43,7 @@ export function MethodologyNotes({ granularity }: Props) {
           fontFamily: FONT.title,
           fontSize: 13,
           fontWeight: 600,
-          color: "#888",
+          color: "#767676",
           display: "flex",
           alignItems: "center",
           gap: 4,

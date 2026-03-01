@@ -57,10 +57,12 @@ function ToggleButton<T extends string>({
   return (
     <button
       onClick={() => onClick(value)}
+      aria-pressed={active}
       style={{
         padding,
+        minHeight: 36,
         border: "1px solid",
-        borderColor: active ? "#333" : "#ccc",
+        borderColor: active ? "#333" : "#999",
         borderRadius: 4,
         background: active ? "#333" : "#fff",
         color: active ? "#fff" : "#555",
@@ -97,14 +99,14 @@ export function ChartControls({
     flexWrap: compact ? "wrap" : undefined,
   };
   const labelStyle: React.CSSProperties = {
-    color: "#888",
+    color: "#767676",
     marginRight: 4,
     lineHeight: "30px",
     minWidth: compact ? undefined : 80,
     width: compact ? "100%" : undefined,
     fontSize: compact ? 11 : undefined,
   };
-  const btnPadding = compact ? "3px 10px" : "4px 14px";
+  const btnPadding = compact ? "6px 10px" : "6px 14px";
   const btnFontSize = compact ? 11.5 : 12.5;
 
   const isIsoView = viewTab !== "state";
@@ -149,15 +151,17 @@ export function ChartControls({
         ))}
         <button
           onClick={onPlayToggle}
+          aria-label={playing ? "Pause year animation" : "Play through years"}
+          aria-pressed={playing}
           title={playing ? "Pause" : "Play through years"}
           style={{
             marginLeft: 8,
-            padding: compact ? "3px 8px" : "4px 10px",
+            padding: compact ? "6px 8px" : "6px 10px",
             border: "1px solid",
-            borderColor: playing ? "#2a9d8f" : "#ccc",
+            borderColor: playing ? "#2a9d8f" : "#999",
             borderRadius: 4,
             background: playing ? "rgba(42, 157, 143, 0.08)" : "#fff",
-            color: playing ? "#2a9d8f" : "#888",
+            color: playing ? "#2a9d8f" : "#767676",
             fontFamily: FONT.body,
             fontSize: compact ? 13 : 14,
             fontWeight: 400,
@@ -167,8 +171,8 @@ export function ChartControls({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: compact ? 28 : 32,
-            height: compact ? 24 : 28,
+            width: compact ? 36 : 36,
+            height: compact ? 36 : 36,
           }}
         >
           {playing ? "\u23F8" : "\u25B6"}

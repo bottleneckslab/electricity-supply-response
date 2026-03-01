@@ -34,8 +34,8 @@ export function getYLabel(priceMetric: PriceMetric, granularity?: GranularityLev
     return "Average Retail Electricity Price (cents/kWh)";
   }
   return priceMetric === "all_in"
-    ? "All-In Price ($/MWh, Energy + Capacity)"
-    : "Average Wholesale Price ($/MWh)";
+    ? "All-In Price ($/MWh, Energy + Capacity, DA/RT mix)"
+    : "Average Wholesale Price ($/MWh, DA/RT mix)";
 }
 
 export function createScales(
