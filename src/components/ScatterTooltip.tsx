@@ -2,7 +2,7 @@ import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
 import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, CapacityBasis, GranularityLevel } from "../lib/types";
 import type { YearKey } from "../App";
 import { capacityPerGwPeak, capacityPerGwPeakElcc, netCapacity } from "../lib/types";
-import { FONT } from "../lib/theme";
+import { FONT, COLOR } from "../lib/theme";
 import { ISO_FILLS } from "../lib/colors";
 
 interface Props {
@@ -15,21 +15,24 @@ interface Props {
   year: YearKey;
   top: number;
   left: number;
+  compact?: boolean;
 }
 
-const tooltipStyles: React.CSSProperties = {
-  ...defaultStyles,
-  fontFamily: FONT.body,
-  fontSize: 13,
-  lineHeight: 1.5,
-  padding: "12px 16px",
-  maxWidth: "min(320px, 90vw)",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-  border: "1px solid #ddd",
-  borderRadius: 4,
-};
+function getTooltipStyles(isCompact?: boolean): React.CSSProperties {
+  return {
+    ...defaultStyles,
+    fontFamily: FONT.body,
+    fontSize: isCompact ? 12 : 13,
+    lineHeight: 1.5,
+    padding: isCompact ? "10px 12px" : "12px 16px",
+    maxWidth: "min(320px, 90vw)",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    border: `1px solid ${COLOR.border.light}`,
+    borderRadius: 4,
+  };
+}
 
-export function ScatterTooltip({ data, xMetric, priceMetric, weighting, basis, granularity, year, top, left }: Props) {
+export function ScatterTooltip({ data, xMetric, priceMetric, weighting, basis, granularity, year, top, left, compact }: Props) {
   const showElcc = weighting === "elcc" && data.capacity_additions_elcc_mw != null;
   const isStateView = granularity === "state";
   const isEst = data.isEstimate === true;
@@ -45,26 +48,26 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, basis, g
   const queueInherited = data.queue_cohort?.startsWith("ISO-level");
 
   return (
-    <TooltipWithBounds top={top} left={left} style={tooltipStyles}>
+    <TooltipWithBounds top={top} left={left} style={getTooltipStyles(compact)}>
       <div
         style={{
           fontWeight: 700,
           fontSize: 14,
           marginBottom: 2,
-          color: ISO_FILLS[isStateView ? data.region : data.id] ?? "#333",
+          color: ISO_FILLS[isStateView ? data.region : data.id] ?? COLOR.text.secondary,
         }}
       >
         {displayName}
-        <span style={{ fontWeight: 400, fontSize: 11, color: "#767676", marginLeft: 6 }}>
+        <span style={{ fontWeight: 400, fontSize: 11, color: COLOR.text.muted, marginLeft: 6 }}>
           {yearLabel}
         </span>
       </div>
       {isEst && (
-        <div style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", marginBottom: 4 }}>
+        <div style={{ color: COLOR.accent.warning, fontSize: 10.5, fontStyle: "italic", marginBottom: 4 }}>
           Estimated — {data.confidence ?? "projected values"}
         </div>
       )}
-      <div style={{ color: "#666", fontSize: 12, marginBottom: 8 }}>
+      <div style={{ color: COLOR.text.tertiary, fontSize: 12, marginBottom: 8 }}>
         {subtitle}
       </div>
       <table style={{ fontSize: 12, borderCollapse: "collapse" }}>
@@ -135,21 +138,21 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, basis, g
           )}
           {queueInherited && (
             <tr>
-              <td colSpan={2} style={{ color: "#767676", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
+              <td colSpan={2} style={{ color: COLOR.text.muted, fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
                 * ISO-level estimate — state-level data not available
               </td>
             </tr>
           )}
           {(data.id === "ERCOT" || data.id === "MISO") && xMetric === "queue" && !isStateView && (
             <tr>
-              <td colSpan={2} style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
+              <td colSpan={2} style={{ color: COLOR.accent.warning, fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
                 Brattle 2018–2020 cohort — not directly comparable to LBNL 2000–2019 used by other ISOs
               </td>
             </tr>
           )}
           {data.id === "TX" && isStateView && (
             <tr>
-              <td colSpan={2} style={{ color: "#e65100", fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
+              <td colSpan={2} style={{ color: COLOR.accent.warning, fontSize: 10.5, fontStyle: "italic", paddingTop: 2 }}>
                 State capacity (18.7 GW) includes unfiled generators. ISO ERCOT view shows 14.0 GW (EIA-860M only).
               </td>
             </tr>
@@ -161,9 +164,9 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, basis, g
           style={{
             marginTop: 8,
             paddingTop: 8,
-            borderTop: "1px solid #eee",
+            borderTop: `1px solid ${COLOR.border.light}`,
             fontSize: 11.5,
-            color: "#555",
+            color: COLOR.text.tertiary,
             fontStyle: "italic",
           }}
         >
@@ -177,13 +180,13 @@ export function ScatterTooltip({ data, xMetric, priceMetric, weighting, basis, g
 function Row({ label, value, highlight, warning }: { label: string; value: string; highlight?: boolean; warning?: boolean }) {
   return (
     <tr>
-      <td style={{ color: "#767676", paddingRight: 12, paddingBottom: 2 }}>{label}</td>
+      <td style={{ color: COLOR.text.muted, paddingRight: 12, paddingBottom: 2 }}>{label}</td>
       <td
         style={{
           fontWeight: 600,
-          color: warning ? "#b71c1c" : highlight ? "#1a1a1a" : "#333",
+          color: warning ? COLOR.accent.error : highlight ? COLOR.text.primary : COLOR.text.secondary,
           paddingBottom: 2,
-          background: warning ? "rgba(183, 28, 28, 0.06)" : highlight ? "rgba(42, 157, 143, 0.08)" : undefined,
+          background: warning ? `${COLOR.accent.error}0F` : highlight ? `${COLOR.accent.brand}14` : undefined,
           borderRadius: (highlight || warning) ? 2 : undefined,
           padding: (highlight || warning) ? "0 4px 2px" : "0 0 2px",
         }}

@@ -7,11 +7,12 @@ import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, Capacit
 import type { YearKey } from "../App";
 import { createScales, getXValue, getXLabel, getXSubtitle, getYValue, getYLabel } from "../lib/scales";
 import { ISO_FILLS, ISO_STROKES } from "../lib/colors";
-import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
+import { FONT, COLOR, getAxisStyle, GRID_STYLE } from "../lib/theme";
 import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
 import { ChartToolbar } from "./ChartToolbar";
 import { MethodologyNotes } from "./MethodologyNotes";
+import { SourceDataTable } from "./SourceDataTable";
 import { HiddenDataTable } from "./HiddenDataTable";
 import { useContainerWidth } from "../lib/useContainerWidth";
 
@@ -120,7 +121,9 @@ export function ElectricityScatter({
     return { top: 60, right: 50, bottom: 88, left: 82 };
   }, [isCompact, isMid]);
 
-  const height = isCompact ? 320 : isMid ? Math.round(width * 0.65) : 580;
+  const height = isCompact ? Math.max(320, Math.round(width * 0.85)) : isMid ? Math.round(width * 0.65) : 580;
+
+  const axisStyle = getAxisStyle(isCompact);
 
   // Handle tab changes
   const handleViewTabChange = useCallback((t: ViewTab) => {
@@ -300,7 +303,7 @@ export function ElectricityScatter({
             fontFamily: FONT.title,
             fontSize: isCompact ? 15 : 19,
             fontWeight: 700,
-            color: "#1a1a1a",
+            color: COLOR.text.primary,
             margin: 0,
             lineHeight: 1.3,
           }}
@@ -311,13 +314,13 @@ export function ElectricityScatter({
           style={{
             fontFamily: FONT.body,
             fontSize: isCompact ? 11 : 13,
-            color: "#666",
+            color: COLOR.text.tertiary,
             margin: "2px 0 0",
           }}
         >
           {getXSubtitle(metric, weighting, basis)}, {year}{year === "2025" ? " (est.)" : ""}
           {isStateView && (
-            <span style={{ color: "#767676", marginLeft: 8, fontSize: isCompact ? 9 : 11 }}>
+            <span style={{ color: COLOR.text.muted, marginLeft: 8, fontSize: isCompact ? 9 : 11 }}>
               State retail prices from EIA ({year} avg, all sectors)
             </span>
           )}
@@ -354,6 +357,17 @@ export function ElectricityScatter({
         aria-label={`Scatter chart showing ${isStateView ? "state-level capacity" : metric === "queue" ? "queue completion" : "supply response"} versus ${isStateView ? "retail electricity price" : priceMetric === "all_in" ? "all-in price" : "wholesale price"} for ${year}${year === "2025" ? " (estimated)" : ""}`}
       >
         <Group top={margin.top} left={margin.left}>
+          {/* Background tap dismiss — compact only */}
+          {isCompact && (
+            <rect
+              x={0}
+              y={0}
+              width={xMax}
+              height={yMax}
+              fill="transparent"
+              onClick={() => { setTappedId(null); hideTooltip(); }}
+            />
+          )}
           {/* Grid */}
           <GridRows
             scale={yScale}
@@ -377,7 +391,7 @@ export function ElectricityScatter({
                 y={yTop}
                 width={xMax}
                 height={Math.max(yBottom - yTop, 4)}
-                fill={ISO_BAND_COLORS[iso] ?? "#999"}
+                fill={ISO_BAND_COLORS[iso] ?? COLOR.text.disabled}
                 opacity={0.04}
                 rx={2}
               />
@@ -391,7 +405,7 @@ export function ElectricityScatter({
                   fontFamily={FONT.body}
                   fontSize={10}
                   fontWeight={600}
-                  fill={ISO_BAND_COLORS[iso] ?? "#999"}
+                  fill={ISO_BAND_COLORS[iso] ?? COLOR.text.disabled}
                   opacity={0.6}
                 >
                   {iso}
@@ -428,9 +442,9 @@ export function ElectricityScatter({
               >
                 <circle
                   r={r}
-                  fill={ISO_FILLS[d.id] ?? "#999"}
-                  fillOpacity={isEst ? 0.20 : 0.55}
-                  stroke={ISO_STROKES[d.id] ?? "#666"}
+                  fill={ISO_FILLS[d.id] ?? COLOR.text.disabled}
+                  fillOpacity={isEst ? 0.20 : d.id === "ISO-NE" ? 0.70 : d.id === "NYISO" ? 0.65 : 0.55}
+                  stroke={ISO_STROKES[d.id] ?? COLOR.text.tertiary}
                   strokeWidth={isEst ? 2 : 1.5}
                   strokeDasharray={isEst ? "4,3" : undefined}
                   style={{ cursor: "pointer", transition: "r 0.4s ease" }}
@@ -447,27 +461,40 @@ export function ElectricityScatter({
                     fontSize={10}
                     fontStyle="italic"
                     fontWeight={600}
-                    fill={ISO_STROKES[d.id] ?? "#666"}
+                    fill={ISO_STROKES[d.id] ?? COLOR.text.tertiary}
                     opacity={0.7}
                     style={{ pointerEvents: "none" }}
                   >
                     2025 est.
                   </text>
                 )}
-                {/* Direct label */}
-                {!isCompact && (
+                {/* Direct label — compact: centered above bubble; desktop: offset */}
+                {isCompact ? (
+                  <text
+                    x={0}
+                    y={-r - 4}
+                    textAnchor="middle"
+                    fontFamily={FONT.body}
+                    fontSize={10}
+                    fontWeight={600}
+                    fill={ISO_STROKES[d.id] ?? COLOR.text.tertiary}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    {d.id}
+                  </text>
+                ) : (
                   <text
                     x={dx}
                     y={dy}
                     fontFamily={FONT.body}
                     fontSize={12}
                     fontWeight={600}
-                    fill={ISO_STROKES[d.id] ?? "#666"}
+                    fill={ISO_STROKES[d.id] ?? COLOR.text.tertiary}
                     style={{ pointerEvents: "none" }}
                   >
                     {d.id}
                     {metric === "queue" && (d.id === "ERCOT" || d.id === "MISO") && (
-                      <tspan fill="#e65100" fontSize={10} fontWeight={400}>{" \u2020"}</tspan>
+                      <tspan fill={COLOR.accent.warning} fontSize={10} fontWeight={400}>{" \u2020"}</tspan>
                     )}
                   </text>
                 )}
@@ -483,8 +510,8 @@ export function ElectricityScatter({
             const cy = yScale(getYValue(d, priceMetric, granularity)) ?? 0;
             const r = rScale(d.peak_demand_gw);
             const isEst = d.isEstimate === true;
-            const bubbleFill = ISO_FILLS[d.region] ?? "#999";
-            const bubbleStroke = ISO_STROKES[d.region] ?? "#666";
+            const bubbleFill = ISO_FILLS[d.region] ?? COLOR.text.disabled;
+            const bubbleStroke = ISO_STROKES[d.region] ?? COLOR.text.tertiary;
             return (
               <g
                 key={d.id}
@@ -537,11 +564,11 @@ export function ElectricityScatter({
             top={yMax}
             scale={xScale}
             label={getXLabel(metric, weighting, basis)}
-            stroke={AXIS_STYLE.strokeColor}
-            tickStroke={AXIS_STYLE.tickStroke}
-            tickLabelProps={() => AXIS_STYLE.tickLabelProps}
+            stroke={axisStyle.strokeColor}
+            tickStroke={axisStyle.tickStroke}
+            tickLabelProps={() => axisStyle.tickLabelProps}
             labelProps={{
-              ...AXIS_STYLE.labelProps,
+              ...axisStyle.labelProps,
               dy: 12,
             }}
             tickFormat={(v) =>
@@ -557,7 +584,7 @@ export function ElectricityScatter({
               fontFamily={FONT.body}
               fontSize={9.5}
               fontStyle="italic"
-              fill="#767676"
+              fill={COLOR.text.muted}
             >
               † ERCOT & MISO: 2018–2020 cohort (Brattle/AEU); all others: 2000–2019 (LBNL Queued Up)
             </text>
@@ -570,7 +597,7 @@ export function ElectricityScatter({
               fontFamily={FONT.body}
               fontSize={9.5}
               fontStyle="italic"
-              fill="#767676"
+              fill={COLOR.text.muted}
             >
               Queue completion rates are ISO-level estimates inherited by states within each ISO
             </text>
@@ -579,15 +606,15 @@ export function ElectricityScatter({
           <AxisLeft
             scale={yScale}
             label={getYLabel(priceMetric, granularity)}
-            stroke={AXIS_STYLE.strokeColor}
-            tickStroke={AXIS_STYLE.tickStroke}
+            stroke={axisStyle.strokeColor}
+            tickStroke={axisStyle.tickStroke}
             tickLabelProps={() => ({
-              ...AXIS_STYLE.tickLabelProps,
+              ...axisStyle.tickLabelProps,
               dx: -6,
               textAnchor: "end" as const,
             })}
             labelProps={{
-              ...AXIS_STYLE.labelProps,
+              ...axisStyle.labelProps,
               dx: isCompact ? -14 : -28,
             }}
             tickFormat={(v) => isStateView ? `${v}¢` : `$${v}`}
@@ -605,7 +632,7 @@ export function ElectricityScatter({
               <text
                 fontFamily={FONT.body}
                 fontSize={isCompact ? 9 : 10}
-                fill="#767676"
+                fill={COLOR.text.muted}
                 dy={-6}
               >
                 Bubble size = {isStateView ? "state" : "system"} peak demand
@@ -620,7 +647,7 @@ export function ElectricityScatter({
                       cy={cy}
                       r={r}
                       fill="none"
-                      stroke="#bbb"
+                      stroke={COLOR.border.default}
                       strokeWidth={1}
                     />
                     {/* Dashed line from top of circle to label */}
@@ -629,7 +656,7 @@ export function ElectricityScatter({
                       y1={cy - r}
                       x2={legendCx + maxR + 4}
                       y2={cy - r}
-                      stroke="#ccc"
+                      stroke={COLOR.border.default}
                       strokeWidth={0.5}
                       strokeDasharray="2,2"
                     />
@@ -639,7 +666,7 @@ export function ElectricityScatter({
                       dominantBaseline="central"
                       fontFamily={FONT.body}
                       fontSize={9}
-                      fill="#767676"
+                      fill={COLOR.text.muted}
                     >
                       {gw} GW
                     </text>
@@ -673,7 +700,7 @@ export function ElectricityScatter({
                 fontFamily={FONT.body}
                 fontSize={isCompact ? 9 : 10}
                 fontStyle="italic"
-                fill="#767676"
+                fill={COLOR.text.muted}
               >
                 Estimated
               </text>
@@ -681,7 +708,7 @@ export function ElectricityScatter({
           );
         })()}
 
-        {/* Color legend — hidden on compact */}
+        {/* SVG Color legend — desktop only */}
         {!isCompact && (() => {
           const colorLegendItems = [
                 { label: "ERCOT", fill: ISO_FILLS.ERCOT, stroke: ISO_STROKES.ERCOT },
@@ -707,7 +734,7 @@ export function ElectricityScatter({
                       dominantBaseline="central"
                       fontFamily={FONT.body}
                       fontSize={10}
-                      fill="#666"
+                      fill={COLOR.text.tertiary}
                     >
                       {item.label}
                     </text>
@@ -719,6 +746,60 @@ export function ElectricityScatter({
         })()}
 
       </svg>
+
+      {/* Compact color legend — HTML flex-wrap below SVG */}
+      {isCompact && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "4px 10px",
+            paddingLeft: margin.left,
+            paddingRight: margin.right,
+            marginTop: 4,
+            marginBottom: 4,
+          }}
+        >
+          {[
+            { label: "ERCOT", fill: ISO_FILLS.ERCOT },
+            { label: "MISO", fill: ISO_FILLS.MISO },
+            { label: "SPP", fill: ISO_FILLS.SPP },
+            { label: "PJM", fill: ISO_FILLS.PJM },
+            { label: "CAISO", fill: ISO_FILLS.CAISO },
+            { label: "NYISO", fill: ISO_FILLS.NYISO },
+            { label: "ISO-NE", fill: ISO_FILLS["ISO-NE"] },
+          ].map((item) => (
+            <span
+              key={item.label}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 3,
+              }}
+            >
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: item.fill,
+                  opacity: 0.75,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: FONT.body,
+                  fontSize: 10,
+                  color: COLOR.text.tertiary,
+                }}
+              >
+                {item.label}
+              </span>
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Hidden data table for screen readers */}
       <HiddenDataTable
@@ -743,91 +824,97 @@ export function ElectricityScatter({
           year={year}
           top={tooltipTop ?? 0}
           left={tooltipLeft ?? 0}
+          compact={isCompact}
         />
       )}
 
-      {/* Footer — data source + toolbar + attribution */}
+      {/* Footer — data source, references, separator, branding + toolbar */}
       <div
         style={{
           maxWidth: width,
           paddingLeft: margin.left,
           paddingRight: margin.right,
-          marginTop: isCompact ? -4 : -20,
+          marginTop: 8,
         }}
       >
-        {/* Data source + toolbar row */}
+        {/* Data source line */}
         <div
           style={{
-            display: "flex",
-            alignItems: "baseline",
-            flexWrap: "wrap",
-            gap: isCompact ? 4 : 6,
+            fontFamily: FONT.body,
+            fontSize: 10,
+            color: COLOR.text.muted,
             marginBottom: 6,
           }}
         >
-          <span
-            style={{
-              fontFamily: FONT.body,
-              fontSize: 9,
-              color: "#767676",
-              flex: isCompact ? "1 1 100%" : undefined,
-            }}
-          >
-            Data: EIA, ISO Market Monitor Reports, LBNL Queued Up 2025
-            {isCompact && metric === "queue" && !isStateView &&
-              " (ERCOT/MISO: 2018–20 cohort via Brattle; others: 2000–19 via LBNL)"}
-            {isCompact && metric === "queue" && isStateView &&
-              " (queue rates are ISO-level estimates)"}
-          </span>
-          <div style={{ marginLeft: isCompact ? undefined : "auto" }}>
-            <ChartToolbar svgRef={svgRef} width={width} height={height} />
-          </div>
+          Data: EIA, ISO Market Monitor Reports, LBNL Queued Up 2025
+          {isCompact && metric === "queue" && !isStateView &&
+            " (ERCOT/MISO: 2018–20 cohort via Brattle; others: 2000–19 via LBNL)"}
+          {isCompact && metric === "queue" && isStateView &&
+            " (queue rates are ISO-level estimates)"}
         </div>
 
-        {/* Attribution row */}
+        {/* Methodology + Source Data row */}
         <div
           style={{
             display: "flex",
+            flexWrap: "wrap",
+            gap: isCompact ? 4 : 8,
+            alignItems: "baseline",
+            marginBottom: 8,
+          }}
+        >
+          <MethodologyNotes granularity={granularity} compact={isCompact} />
+          <SourceDataTable />
+        </div>
+
+        {/* Separator */}
+        <div style={{ borderTop: `1px solid ${COLOR.border.light}`, marginBottom: 8 }} />
+
+        {/* Branding + Toolbar row */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
             gap: 6,
             marginBottom: 6,
           }}
         >
           {/* Logo mark */}
-          <svg width={14} height={14} viewBox="0 0 14 14">
-            <defs>
-              <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#2a9d8f" />
-                <stop offset="50%" stopColor="#e9c46a" />
-                <stop offset="100%" stopColor="#e76f51" />
-              </linearGradient>
-            </defs>
-            <rect width={14} height={14} fill="#1a1a2e" rx={1.5} />
-            <path
-              d="M 0,9.8 L 1.12,8.8 L 2.52,10.5 L 3.92,7 L 5.32,8.4 L 7,4.2 L 8.68,7.7 L 10.08,6.3 L 11.48,8.4 L 12.88,7.7 L 14,9.1"
-              stroke="url(#brandGrad)"
-              strokeWidth={0.9}
-              fill="none"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span
-            style={{
-              fontFamily: FONT.brand,
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: "0.02em",
-              color: "#555",
-            }}
-          >
-            Bottlenecks Lab
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flex: isCompact ? "1 1 100%" : undefined }}>
+            <svg width={14} height={14} viewBox="0 0 14 14">
+              <defs>
+                <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#2a9d8f" />
+                  <stop offset="50%" stopColor="#e9c46a" />
+                  <stop offset="100%" stopColor="#e76f51" />
+                </linearGradient>
+              </defs>
+              <rect width={14} height={14} fill="#1a1a2e" rx={1.5} />
+              <path
+                d="M 0,9.8 L 1.12,8.8 L 2.52,10.5 L 3.92,7 L 5.32,8.4 L 7,4.2 L 8.68,7.7 L 10.08,6.3 L 11.48,8.4 L 12.88,7.7 L 14,9.1"
+                stroke="url(#brandGrad)"
+                strokeWidth={0.9}
+                fill="none"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span
+              style={{
+                fontFamily: FONT.brand,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                color: COLOR.text.tertiary,
+              }}
+            >
+              Bottlenecks Lab
+            </span>
+          </div>
+          <div style={{ marginLeft: isCompact ? undefined : "auto", justifyContent: isCompact ? "center" : undefined, display: "flex" }}>
+            <ChartToolbar svgRef={svgRef} width={width} height={height} compact={isCompact} />
+          </div>
         </div>
-      </div>
-
-      {/* Methodology & Data Notes (collapsible) */}
-      <div style={{ paddingLeft: margin.left, paddingRight: margin.right }}>
-        <MethodologyNotes granularity={granularity} />
       </div>
     </div>
   );

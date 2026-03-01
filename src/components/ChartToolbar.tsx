@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type RefObject } from "react";
-import { FONT } from "../lib/theme";
+import { FONT, COLOR } from "../lib/theme";
 
 const DEPLOY_URL =
   "https://bottleneckslab.github.io/electricity-supply-response/";
@@ -9,6 +9,7 @@ interface Props {
   /** Full width of the chart wrapper for sizing the embed iframe */
   width: number;
   height: number;
+  compact?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -112,28 +113,30 @@ function downloadPng(svg: SVGSVGElement) {
 /*  Button style                                                      */
 /* ------------------------------------------------------------------ */
 
-const btnStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 5,
-  padding: "6px 10px",
-  minHeight: 36,
-  border: "1px solid #999",
-  borderRadius: 4,
-  background: "#fff",
-  color: "#666",
-  fontFamily: FONT.body,
-  fontSize: 12,
-  cursor: "pointer",
-  transition: "all 0.15s ease",
-  lineHeight: 1,
-};
+function getBtnStyle(isCompact?: boolean): React.CSSProperties {
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 5,
+    padding: "6px 10px",
+    minHeight: isCompact ? 40 : 36,
+    border: `1px solid ${COLOR.border.strong}`,
+    borderRadius: 4,
+    background: "#fff",
+    color: COLOR.text.tertiary,
+    fontFamily: FONT.body,
+    fontSize: 12,
+    cursor: "pointer",
+    transition: "all 0.15s ease",
+    lineHeight: 1,
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                         */
 /* ------------------------------------------------------------------ */
 
-export function ChartToolbar({ svgRef, width, height }: Props) {
+export function ChartToolbar({ svgRef, width, height, compact }: Props) {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const dropRef = useRef<HTMLDivElement>(null);
@@ -168,21 +171,29 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
     });
   }
 
+  const style = getBtnStyle(compact);
+  const pointerHandlers = {
+    onPointerDown: (e: React.PointerEvent) => { (e.currentTarget as HTMLElement).style.opacity = "0.7"; },
+    onPointerUp: (e: React.PointerEvent) => { (e.currentTarget as HTMLElement).style.opacity = "1"; },
+    onPointerLeave: (e: React.PointerEvent) => { (e.currentTarget as HTMLElement).style.opacity = "1"; },
+  };
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
       {/* Download dropdown */}
       <div ref={dropRef} style={{ position: "relative" }}>
         <button
-          style={btnStyle}
+          style={style}
           onClick={() => setDownloadOpen((v) => !v)}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#767676";
-            e.currentTarget.style.color = "#333";
+            e.currentTarget.style.borderColor = COLOR.text.muted;
+            e.currentTarget.style.color = COLOR.text.secondary;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#999";
-            e.currentTarget.style.color = "#666";
+            e.currentTarget.style.borderColor = COLOR.border.strong;
+            e.currentTarget.style.color = COLOR.text.tertiary;
           }}
+          {...pointerHandlers}
         >
           <DownloadIcon /> Download
         </button>
@@ -193,7 +204,7 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
               bottom: "calc(100% + 4px)",
               right: 0,
               background: "#fff",
-              border: "1px solid #999",
+              border: `1px solid ${COLOR.border.strong}`,
               borderRadius: 4,
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               zIndex: 10,
@@ -211,12 +222,12 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
                   background: "transparent",
                   fontFamily: FONT.body,
                   fontSize: 12,
-                  color: "#555",
+                  color: COLOR.text.tertiary,
                   textAlign: "left",
                   cursor: "pointer",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#f5f5f5";
+                  e.currentTarget.style.background = COLOR.surface.subtle;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "transparent";
@@ -237,32 +248,34 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
 
       {/* Share */}
       <button
-        style={btnStyle}
+        style={style}
         onClick={handleShare}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "#767676";
-          e.currentTarget.style.color = "#333";
+          e.currentTarget.style.borderColor = COLOR.text.muted;
+          e.currentTarget.style.color = COLOR.text.secondary;
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "#999";
-          e.currentTarget.style.color = "#666";
+          e.currentTarget.style.borderColor = COLOR.border.strong;
+          e.currentTarget.style.color = COLOR.text.tertiary;
         }}
+        {...pointerHandlers}
       >
         <ShareIcon /> Share
       </button>
 
       {/* Embed */}
       <button
-        style={btnStyle}
+        style={style}
         onClick={handleEmbed}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "#767676";
-          e.currentTarget.style.color = "#333";
+          e.currentTarget.style.borderColor = COLOR.text.muted;
+          e.currentTarget.style.color = COLOR.text.secondary;
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "#999";
-          e.currentTarget.style.color = "#666";
+          e.currentTarget.style.borderColor = COLOR.border.strong;
+          e.currentTarget.style.color = COLOR.text.tertiary;
         }}
+        {...pointerHandlers}
       >
         <EmbedIcon /> Embed
       </button>
@@ -273,7 +286,7 @@ export function ChartToolbar({ svgRef, width, height }: Props) {
           style={{
             fontFamily: FONT.body,
             fontSize: 12,
-            color: "#2a9d8f",
+            color: COLOR.accent.brand,
             fontWeight: 600,
             marginLeft: 4,
           }}

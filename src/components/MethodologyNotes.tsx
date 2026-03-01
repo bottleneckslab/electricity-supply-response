@@ -1,19 +1,19 @@
 import { useState } from "react";
 import type { GranularityLevel } from "../lib/types";
-import { FONT } from "../lib/theme";
+import { FONT, COLOR } from "../lib/theme";
 
 const HEADING_STYLE: React.CSSProperties = {
   fontFamily: FONT.title,
   fontSize: 12,
   fontWeight: 700,
-  color: "#555",
+  color: COLOR.text.tertiary,
   margin: "12px 0 4px",
 };
 
 const TEXT_STYLE: React.CSSProperties = {
   fontFamily: FONT.body,
   fontSize: 11,
-  color: "#767676",
+  color: COLOR.text.muted,
   lineHeight: 1.6,
   margin: "0 0 4px",
 };
@@ -26,13 +26,16 @@ const LI_STYLE: React.CSSProperties = {
 
 interface Props {
   granularity: GranularityLevel;
+  compact?: boolean;
 }
 
-export function MethodologyNotes({ granularity }: Props) {
+export function MethodologyNotes({ granularity, compact }: Props) {
   const [open, setOpen] = useState(false);
 
+  const bodyFontSize = compact ? 12 : 11;
+
   return (
-    <div style={{ marginTop: 12 }}>
+    <div style={{ marginTop: 0 }}>
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -43,7 +46,7 @@ export function MethodologyNotes({ granularity }: Props) {
           fontFamily: FONT.title,
           fontSize: 13,
           fontWeight: 600,
-          color: "#767676",
+          color: COLOR.text.muted,
           display: "flex",
           alignItems: "center",
           gap: 4,
@@ -54,7 +57,7 @@ export function MethodologyNotes({ granularity }: Props) {
       </button>
 
       {open && (
-        <div style={{ maxWidth: "100%", marginTop: 8 }}>
+        <div style={{ maxWidth: "65ch", marginTop: 8, fontSize: bodyFontSize }}>
           {granularity === "state" && (
             <>
               <h4 style={HEADING_STYLE}>State-level view</h4>

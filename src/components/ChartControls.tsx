@@ -1,6 +1,6 @@
 import type { ViewTab, PriceMetric, CapacityWeighting, CapacityBasis } from "../lib/types";
 import type { YearKey } from "../App";
-import { FONT } from "../lib/theme";
+import { FONT, COLOR } from "../lib/theme";
 
 interface Props {
   compact?: boolean;
@@ -19,10 +19,10 @@ interface Props {
   onPlayToggle: () => void;
 }
 
-const tabOptions: { value: ViewTab; label: string }[] = [
-  { value: "capacity", label: "RTO/ISO Capacity \u00d7 Price" },
-  { value: "queue", label: "RTO/ISO Queue \u00d7 Price" },
-  { value: "state", label: "State Capacity \u00d7 Price" },
+const tabOptions: { value: ViewTab; label: string; compactLabel: string }[] = [
+  { value: "capacity", label: "RTO/ISO Capacity \u00d7 Price", compactLabel: "Capacity" },
+  { value: "queue", label: "RTO/ISO Queue \u00d7 Price", compactLabel: "Queue" },
+  { value: "state", label: "State Capacity \u00d7 Price", compactLabel: "State" },
 ];
 
 const priceOptions: { value: PriceMetric; label: string }[] = [
@@ -78,6 +78,9 @@ function Segment<T extends string>({
   return (
     <button
       onClick={() => onClick(value)}
+      onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.7"; }}
+      onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+      onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
       aria-pressed={active}
       style={{
         padding: isPrimary
@@ -90,25 +93,25 @@ function Segment<T extends string>({
         border: "1px solid",
         borderColor: active
           ? isPrimary
-            ? "#333"
-            : "#888"
+            ? COLOR.text.secondary
+            : COLOR.text.disabled
           : isPrimary
-            ? "#bbb"
-            : "#ccc",
+            ? COLOR.border.default
+            : COLOR.border.default,
         borderRadius,
         marginLeft: position === "first" || position === "only" ? 0 : -1,
         background: active
           ? isPrimary
-            ? "#333"
-            : "#f5f5f5"
+            ? COLOR.text.secondary
+            : COLOR.surface.subtle
           : "#fff",
         color: active
           ? isPrimary
             ? "#fff"
-            : "#333"
+            : COLOR.text.secondary
           : isPrimary
-            ? "#555"
-            : "#888",
+            ? COLOR.text.tertiary
+            : COLOR.text.disabled,
         fontFamily: FONT.body,
         fontSize: isPrimary
           ? compact
@@ -155,7 +158,7 @@ function SmallToggleGroup<T extends string>({
     >
       <span
         style={{
-          color: "#767676",
+          color: COLOR.text.muted,
           fontSize: compact ? 10 : 11,
           fontFamily: FONT.body,
           whiteSpace: "nowrap",
@@ -167,7 +170,7 @@ function SmallToggleGroup<T extends string>({
       <span
         style={{
           display: "inline-flex",
-          border: "1px solid #ccc",
+          border: `1px solid ${COLOR.border.default}`,
           borderRadius: 3,
           overflow: "hidden",
         }}
@@ -178,14 +181,17 @@ function SmallToggleGroup<T extends string>({
             <button
               key={o.value}
               onClick={() => onClick(o.value)}
+              onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.7"; }}
+              onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+              onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
               aria-pressed={isActive}
               style={{
                 padding: compact ? "2px 7px" : "2px 9px",
                 border: "none",
-                borderLeft: i > 0 ? "1px solid #ccc" : "none",
+                borderLeft: i > 0 ? `1px solid ${COLOR.border.default}` : "none",
                 borderRadius: 0,
-                background: isActive ? "#f5f5f5" : "#fff",
-                color: isActive ? "#333" : "#aaa",
+                background: isActive ? COLOR.surface.subtle : "#fff",
+                color: isActive ? COLOR.text.secondary : COLOR.text.disabled,
                 fontFamily: FONT.body,
                 fontSize: compact ? 10 : 11,
                 fontWeight: isActive ? 600 : 400,
@@ -248,7 +254,7 @@ export function ChartControls({
       >
         <span
           style={{
-            color: "#767676",
+            color: COLOR.text.muted,
             minWidth: labelWidth,
             fontSize: compact ? 11 : 12,
             fontFamily: FONT.body,
@@ -260,7 +266,7 @@ export function ChartControls({
           <Segment
             key={o.value}
             value={o.value}
-            label={o.label}
+            label={compact ? o.compactLabel : o.label}
             active={viewTab === o.value}
             onClick={onViewTabChange}
             tier="primary"
@@ -288,7 +294,7 @@ export function ChartControls({
       >
         <span
           style={{
-            color: "#767676",
+            color: COLOR.text.muted,
             minWidth: labelWidth,
             fontSize: compact ? 11 : 12,
             fontFamily: FONT.body,
@@ -325,7 +331,7 @@ export function ChartControls({
             border: "none",
             borderRadius: 0,
             background: "none",
-            color: playing ? "#2a9d8f" : "#999",
+            color: playing ? COLOR.accent.brand : COLOR.text.disabled,
             fontFamily: FONT.body,
             fontSize: compact ? 12 : 13,
             fontWeight: 400,
@@ -348,8 +354,8 @@ export function ChartControls({
             display: "flex",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: compact ? 8 : 14,
-            paddingLeft: labelWidth,
+            gap: compact ? 6 : 14,
+            paddingLeft: compact ? 0 : labelWidth,
           }}
         >
           {showCapBasis && (
