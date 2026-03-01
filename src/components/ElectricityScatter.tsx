@@ -6,7 +6,7 @@ import { useTooltip } from "@visx/tooltip";
 import type { ISODataPoint, XAxisMetric, PriceMetric, CapacityWeighting, GranularityLevel, ViewTab } from "../lib/types";
 import type { YearKey } from "../App";
 import { createScales, getXValue, getXLabel, getXSubtitle, getYValue, getYLabel } from "../lib/scales";
-import { GROUP_FILLS, GROUP_STROKES } from "../lib/colors";
+import { GROUP_FILLS, GROUP_STROKES, ISO_FILLS, ISO_STROKES } from "../lib/colors";
 import { FONT, AXIS_STYLE, GRID_STYLE } from "../lib/theme";
 import { ScatterTooltip } from "./ScatterTooltip";
 import { ChartControls } from "./ChartControls";
@@ -58,15 +58,15 @@ function getViewKey(metric: XAxisMetric, weighting: CapacityWeighting): ViewKey 
   return weighting === "elcc" ? "capacity_elcc" : "capacity";
 }
 
-/** ISO color mapping for horizontal band labels */
+/** ISO color mapping for horizontal band labels — matches ISO_STROKES */
 const ISO_BAND_COLORS: Record<string, string> = {
-  ERCOT: "#2166ac",
-  MISO: "#2166ac",
-  SPP: "#5e4fa2",
-  CAISO: "#5e4fa2",
-  PJM: "#5e4fa2",
-  NYISO: "#b2182b",
-  "ISO-NE": "#b2182b",
+  ERCOT:    "#2166ac",
+  MISO:     "#1b9e77",
+  SPP:      "#d95f02",
+  CAISO:    "#c51b7d",
+  PJM:      "#5e4fa2",
+  NYISO:    "#4d9221",
+  "ISO-NE": "#b8860b",
 };
 
 interface Props {
@@ -111,15 +111,13 @@ export function ElectricityScatter({
 
   const height = isCompact ? 320 : isMid ? Math.round(width * 0.65) : 580;
 
-  // Handle tab changes — snap year if needed
+  // Handle tab changes
   const handleViewTabChange = useCallback((t: ViewTab) => {
     setViewTab(t);
     if (t === "state") {
       setPlaying(false);
-      // Snap to 2024 if currently on 2025 (no state data for 2025)
-      if (year === "2025") onYearChange("2024");
     }
-  }, [year, onYearChange]);
+  }, []);
 
   // Manual year change stops playback
   const handleYearChange = useCallback((y: YearKey) => {
@@ -451,15 +449,16 @@ export function ElectricityScatter({
             );
           })}
 
-          {/* State view bubbles — with animated transitions, colored by siting regime */}
+          {/* State view bubbles — with animated transitions */}
           {isStateView && stateUnion.map((baseD) => {
             const isActive = currentStateIds.has(baseD.id);
             const d = stateData.find((curr) => curr.id === baseD.id) ?? baseD;
             const cx = xScale(getXValue(d, metric, weighting)) ?? 0;
             const cy = yScale(getYValue(d, priceMetric, granularity)) ?? 0;
             const r = rScale(d.peak_demand_gw);
-            const bubbleFill = GROUP_FILLS[d.color_group];
-            const bubbleStroke = GROUP_STROKES[d.color_group];
+            const isEst = d.isEstimate === true;
+            const bubbleFill = ISO_FILLS[d.region] ?? "#999";
+            const bubbleStroke = ISO_STROKES[d.region] ?? "#666";
             return (
               <g
                 key={d.id}
@@ -473,9 +472,10 @@ export function ElectricityScatter({
                 <circle
                   r={r}
                   fill={bubbleFill}
-                  fillOpacity={0.45}
+                  fillOpacity={isEst ? 0.20 : 0.45}
                   stroke={bubbleStroke}
-                  strokeWidth={1}
+                  strokeWidth={isEst ? 1.5 : 1}
+                  strokeDasharray={isEst ? "4,3" : undefined}
                   style={{ cursor: "pointer", transition: "r 0.4s ease" }}
                   onMouseEnter={isCompact ? undefined : () => handleMouseEnter(d, cx, cy)}
                   onMouseLeave={isCompact ? undefined : hideTooltip}
@@ -652,7 +652,17 @@ export function ElectricityScatter({
 
         {/* Color legend — hidden on compact */}
         {!isCompact && (() => {
-          const colorLegendItems = [
+          const colorLegendItems = isStateView
+            ? [
+                { label: "ERCOT", fill: ISO_FILLS.ERCOT, stroke: ISO_STROKES.ERCOT },
+                { label: "MISO", fill: ISO_FILLS.MISO, stroke: ISO_STROKES.MISO },
+                { label: "SPP", fill: ISO_FILLS.SPP, stroke: ISO_STROKES.SPP },
+                { label: "PJM", fill: ISO_FILLS.PJM, stroke: ISO_STROKES.PJM },
+                { label: "CAISO", fill: ISO_FILLS.CAISO, stroke: ISO_STROKES.CAISO },
+                { label: "NYISO", fill: ISO_FILLS.NYISO, stroke: ISO_STROKES.NYISO },
+                { label: "ISO-NE", fill: ISO_FILLS["ISO-NE"], stroke: ISO_STROKES["ISO-NE"] },
+              ]
+            : [
                 { label: "Functional", fill: GROUP_FILLS.functional, stroke: GROUP_STROKES.functional },
                 { label: "Intermediate", fill: GROUP_FILLS.intermediate, stroke: GROUP_STROKES.intermediate },
                 { label: "Broken", fill: GROUP_FILLS.broken, stroke: GROUP_STROKES.broken },

@@ -277,9 +277,9 @@ All 7 ISOs have 2025 estimates. No annual SOM reports are published yet (expect 
 
 All 2025 estimate points are rendered with dashed outlines and reduced opacity to distinguish them from observed data.
 
-### State multi-year data (2023 & 2024)
+### State multi-year data (2023, 2024 & 2025)
 
-State-level data supports 2023 and 2024 (no 2025 state data — EIA retail prices for 2025 expected ~Aug 2026, full EIA-860M capacity data ~Jan 2027).
+State-level data supports 2023, 2024, and 2025 (estimated). All 2025 state rows are marked `is_estimate=True`.
 
 **2023 state data sources:**
 - **Capacity additions:** EIA-860M January 2026 vintage, grouped by Plant State field
@@ -287,6 +287,13 @@ State-level data supports 2023 and 2024 (no 2025 state data — EIA retail price
 - **Wholesale prices:** Inherited from parent ISO's 2023 wholesale price
 - **Peak demand:** Uses 2024 peak demand as proxy (~1–2% YoY variation; state-level coincident peak data for 2023 not separately sourced)
 - **Queue completion:** Same cohort-based rates as 2024 (not annual metrics)
+
+**2025 state data sources:**
+- **Capacity additions:** EIA-860M January 2026 vintage, Operating Year == 2025, grouped by Plant State. NH and VT show zero additions (expected for small states with filing lag). ELCC computed per generator using ISO-specific technology factors (solar 30–50%, wind 15–25%, battery 85–90%, gas 95%).
+- **Retail prices:** EIA Electric Power Monthly Table 5.06.B, December 2025 YTD (= full-year 2025 annual average, all sectors, cents/kWh). These are actual EIA data, not estimates.
+- **Wholesale/all-in prices:** Inherited from parent ISO's 2025 estimate row.
+- **Peak demand:** Uses 2024 peak demand as proxy (~1–2% YoY variation).
+- **Queue completion:** Same cohort-based rates as 2024 (not annual metrics).
 
 ## Caveats
 

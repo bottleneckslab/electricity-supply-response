@@ -5,6 +5,7 @@ import isoDataset2023 from "../data/verified/iso_scatter_data_2023.json";
 import isoDataset2025 from "../data/verified/iso_scatter_data_2025_est.json";
 import stateDataset from "../data/verified/state_scatter_data.json";
 import stateDataset2023 from "../data/verified/state_scatter_data_2023.json";
+import stateDataset2025 from "../data/verified/state_scatter_data_2025_est.json";
 import type { ISOScatterDataset, ISODataPoint } from "./lib/types";
 
 type StateDataset = { metadata: ISOScatterDataset["metadata"]; states: ISODataPoint[] };
@@ -14,6 +15,7 @@ const isoData2023 = (isoDataset2023 as ISOScatterDataset).isos;
 const isoData2025 = (isoDataset2025 as ISOScatterDataset).isos;
 const stateData2024 = (stateDataset as StateDataset).states;
 const stateData2023 = (stateDataset2023 as StateDataset).states;
+const stateData2025 = (stateDataset2025 as StateDataset).states;
 
 export type YearKey = "2023" | "2024" | "2025";
 
@@ -24,14 +26,14 @@ const isoDataByYear: Record<YearKey, ISODataPoint[]> = {
 };
 
 const availableYears: YearKey[] = ["2023", "2024", "2025"];
-const stateYears: YearKey[] = ["2023", "2024"];
+const stateYears: YearKey[] = ["2023", "2024", "2025"];
 const allIsoData: ISODataPoint[] = [...isoData2023, ...isoData2024, ...isoData2025];
-const allStateData: ISODataPoint[] = [...stateData2023, ...stateData2024];
+const allStateData: ISODataPoint[] = [...stateData2023, ...stateData2024, ...stateData2025];
 
 const stateDataByYear: Record<YearKey, ISODataPoint[]> = {
   "2023": stateData2023,
   "2024": stateData2024,
-  "2025": stateData2024, // No 2025 state data; fall back to 2024
+  "2025": stateData2025,
 };
 
 export default function App() {

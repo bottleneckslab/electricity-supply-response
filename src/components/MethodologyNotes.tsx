@@ -62,7 +62,7 @@ export function MethodologyNotes({ granularity }: Props) {
                 <li style={LI_STYLE}>
                   State capacity additions from EIA-860M "Plant State" field — counts all generators
                   reaching commercial operation in the selected year, regardless of which ISO the plant's
-                  Balancing Authority belongs to. Data available for 2023 and 2024.
+                  Balancing Authority belongs to. Data available for 2023, 2024, and 2025 (estimated).
                 </li>
                 <li style={LI_STYLE}>
                   State peak demand from EIA-861 Annual Electric Power Industry Report (coincident state peak).
@@ -94,10 +94,11 @@ export function MethodologyNotes({ granularity }: Props) {
           <h4 style={HEADING_STYLE}>Multi-year data</h4>
           <ul style={{ listStyle: "disc", paddingLeft: 20, margin: 0 }}>
             <li style={LI_STYLE}>
-              <strong>Capacity additions (2023 & 2024):</strong> sourced from EIA-860M January 2026 vintage
-              — a single federal source providing consistent methodology across both years. Industry sources
+              <strong>Capacity additions (2023–2025):</strong> sourced from EIA-860M January 2026 vintage
+              — a single federal source providing consistent methodology across all three years. Industry sources
               report higher figures for some ISOs (e.g., ~18.7 GW for ERCOT 2024 vs. 14.0 GW in EIA-860M),
-              likely due to filing lag in the monthly generator inventory.
+              likely due to filing lag in the monthly generator inventory. 2025 state data may
+              undercount late-2025 additions not yet filed.
             </li>
             <li style={LI_STYLE}>
               <strong>2023 prices:</strong> ERCOT, SPP, PJM, and ISO-NE from market monitor State of the
@@ -105,13 +106,14 @@ export function MethodologyNotes({ granularity }: Props) {
               figures minus capacity adders (medium confidence, marked in tooltip).
             </li>
             <li style={LI_STYLE}>
-              <strong>2025 estimates (all 7 ISOs):</strong> No annual SOM reports published yet
-              (expect May–Aug 2026). Prices: ERCOT $37.57 and SPP $37.91 from EIA STEO monthly;
+              <strong>2025 estimates (all 7 ISOs + 32 states):</strong> No annual SOM reports published yet
+              (expect May–Aug 2026). ISO prices: ERCOT $37.57 and SPP $37.91 from EIA STEO monthly;
               CAISO ~$35 from DMM quarterly; NYISO and ISO-NE ~$55 (winter gas spikes). PJM BRA
               2025/26 at $269.92/MW-day (~$18/MWh capacity adder, 9× increase); MISO PRA at
-              $217/MW-day annualized (~$9/MWh, 10× increase). Capacity: ERCOT 11 GW (Modo Energy),
-              CAISO 5.7 GW (Year in Review), others estimated proportionally to 2024. All shown
-              with dashed outline to distinguish from observed data.
+              $217/MW-day annualized (~$9/MWh, 10× increase). ISO capacity: ERCOT 11 GW (Modo Energy),
+              CAISO 5.7 GW (Year in Review), others estimated proportionally to 2024. State-level
+              2025 capacity from EIA-860M (operating year 2025); retail prices from EIA EPM Table 5.06.B
+              (actual full-year 2025 data). All shown with dashed outline to distinguish from observed data.
             </li>
           </ul>
 

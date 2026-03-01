@@ -94,6 +94,20 @@ METADATA = {
             "capacity. See methodology notes for full details."
         ),
     },
+    ("state", 2025): {
+        "title": "US State-Level Electricity Supply Response Data \u2014 2025 Estimate",
+        "author": "Bottlenecks Lab",
+        "primary_year": 2025,
+        "notes": (
+            "State-level 2025 estimates: capacity from EIA-860M Jan 2026 vintage "
+            "(operating year 2025), retail prices from EIA Electric Power Monthly "
+            "Table 5.06.B (Dec 2025 YTD = full-year 2025 average, all sectors). "
+            "Wholesale/all-in prices inherited from parent ISO 2025 estimates. "
+            "Peak demand uses 2024 values as proxy. ELCC computed per generator "
+            "using ISO-specific technology factors. NH and VT have zero 2025 "
+            "additions per EIA-860M (expected for small states with filing lag)."
+        ),
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -106,6 +120,7 @@ OUTPUT_MAP = {
     ("iso", 2025): ("iso_scatter_data_2025_est.json", "isos"),
     ("state", 2023): ("state_scatter_data_2023.json", "states"),
     ("state", 2024): ("state_scatter_data.json", "states"),
+    ("state", 2025): ("state_scatter_data_2025_est.json", "states"),
 }
 
 

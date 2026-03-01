@@ -4,8 +4,8 @@
 
 This document provides a field-by-field audit trail for every data point in `data/verified/iso_scatter_data.json`. Each value is paired with its primary source citation, methodology annotation, and a verification checkbox. The goal: any reviewer can independently verify every number in the dataset without re-reading the methodology doc or hunting through source reports.
 
-**Scope:** 7 ISOs, ~15 fields each, calendar years 2023–2025. 2025 data for all 7 ISOs are estimates (no annual SOM reports published yet).
-**Data vintage:** Compiled 2026-02-28, primary data year 2024. Multi-year update adds 2023 and PJM 2025 est.
+**Scope:** 7 ISOs + 32 states, ~15 fields each, calendar years 2023–2025. 2025 data (all ISOs + states) are estimates (no annual SOM reports published yet). State 2025 retail prices are actual EIA EPM data; capacity from EIA-860M Jan 2026 vintage.
+**Data vintage:** Compiled 2026-02-28, primary data year 2024. Multi-year update adds 2023, 2025 ISO estimates, and 2025 state estimates.
 **Author:** Bottlenecks Lab
 
 ## How to Use This Document
